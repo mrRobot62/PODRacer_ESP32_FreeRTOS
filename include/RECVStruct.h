@@ -7,6 +7,7 @@ struct RECV_Struct {
     bool armingAllowed;
     int armingState;
     bool isArmed;
+    
 };
 
 // Deklariere die globale Struktur, die in mehreren Dateien verwendet wird

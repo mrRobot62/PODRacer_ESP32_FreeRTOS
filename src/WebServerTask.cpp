@@ -2,7 +2,7 @@
 #include <ESPAsyncWebServer.h>
 #include <SPIFFS.h>
 #include "WebServerTask.h"
-#include "Preferences.h"
+#include <Preferences.h>
 //#include "ConfigManager.h"
 #include <ArduinoJson.h>  // Füge dies hinzu für DynamicJsonDocument
 
@@ -12,7 +12,7 @@ void WiFiEvent(WiFiEvent_t event);
 AsyncWebServer server(80);
 
 // Deklariere `preferences` als extern, damit es in anderen Dateien verwendet werden kann
-extern Preferences preferences;
+//extern Preferences preferences;
 
 QueueHandle_t queueWebServer;
 
@@ -36,15 +36,13 @@ void handleGetNamespaces(AsyncWebServerRequest *request) {
 void handleLoadConfig(AsyncWebServerRequest *request) {
     if (request->hasParam("namespace")) {
         String ns = request->getParam("namespace")->value();
-        preferences.begin(ns.c_str(), true);
 
         // Beispielkonfiguration
         String response = "{\"config\": [";
-        response += "{\"key\": \"setting1\", \"value\": \"" + preferences.getString("setting1", "default1") + "\"},";
-        response += "{\"key\": \"setting2\", \"value\": \"" + preferences.getString("setting2", "default2") + "\"}";
-        response += "]}";
+        // response += "{\"key\": \"setting1\", \"value\": \"" + preferences.getString("setting1", "default1") + "\"},";
+        // response += "{\"key\": \"setting2\", \"value\": \"" + preferences.getString("setting2", "default2") + "\"}";
+        // response += "]}";
 
-        preferences.end();
         request->send(200, "application/json", response);
     } else {
         request->send(400, "text/plain", "Namespace not provided");
@@ -68,13 +66,13 @@ void handleSaveConfig(AsyncWebServerRequest *request) {
         String ns = doc["namespace"];
         JsonObject config = doc["config"];
 
-        preferences.begin(ns.c_str(), false);
-        for (JsonPair kv : config) {
-            preferences.putString(kv.key().c_str(), kv.value().as<String>());
-        }
-        preferences.end();
+        // preferences.begin(ns.c_str(), false);
+        // for (JsonPair kv : config) {
+        //     preferences.putString(kv.key().c_str(), kv.value().as<String>());
+        // }
+        // preferences.end();
 
-        request->send(200, "text/plain", "Config saved");
+        // request->send(200, "text/plain", "Config saved");
     } else {
         request->send(400, "text/plain", "Invalid data");
     }
@@ -97,8 +95,6 @@ void handleWifi(AsyncWebServerRequest *request) {
 }
 
 void webServerTask(void *parameter) {
-
-
     // Deaktivieren des persistenten Speichers für WiFi-Einstellungen
     WiFi.persistent(false);
 
@@ -146,7 +142,6 @@ void webServerTask(void *parameter) {
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }
-
 
 void WiFiEvent(WiFiEvent_t event) {
     switch (event) {

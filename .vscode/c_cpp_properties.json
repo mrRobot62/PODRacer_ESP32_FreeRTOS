@@ -9,6 +9,8 @@
             "name": "PlatformIO",
             "includePath": [
                 "/Users/bernhardklein/Library/Mobile Documents/com~apple~CloudDocs/FPV/PODRacer_ESP32_FreeRTOS/src",
+                "/Users/bernhardklein/Documents/Arduino/libraries/VL53L1X",
+                "/Users/bernhardklein/.platformio/packages/framework-arduinoespressif32/libraries/Wire/src",
                 "/Users/bernhardklein/.platformio/packages/framework-arduinoespressif32/libraries/Preferences/src",
                 "/Users/bernhardklein/Documents/Arduino/libraries/TFMiniS/src",
                 "/Users/bernhardklein/Library/Mobile Documents/com~apple~CloudDocs/FPV/PODRacer_ESP32_FreeRTOS/.pio/libdeps/esp32dev/ESPAsyncWebServer/src",
@@ -260,7 +262,6 @@
                 "/Users/bernhardklein/Documents/Arduino/libraries/U8g2_for_Adafruit_GFX/src",
                 "/Users/bernhardklein/Documents/Arduino/libraries/U8g2_for_TFT_eSPI/src",
                 "/Users/bernhardklein/Documents/Arduino/libraries/VL53L0X",
-                "/Users/bernhardklein/Documents/Arduino/libraries/VL53L1X",
                 "/Users/bernhardklein/Documents/Arduino/libraries/Vector/src",
                 "/Users/bernhardklein/Documents/Arduino/libraries/WebServer_ESP32_ENC/src",
                 "/Users/bernhardklein/Documents/Arduino/libraries/WebServer_ESP32_SC_ENC/src",
@@ -297,13 +298,14 @@
                 "/Users/bernhardklein/.platformio/packages/framework-arduinoespressif32/libraries/Update/src",
                 "/Users/bernhardklein/.platformio/packages/framework-arduinoespressif32/libraries/WiFiClientSecure/src",
                 "/Users/bernhardklein/.platformio/packages/framework-arduinoespressif32/libraries/WiFiProv/src",
-                "/Users/bernhardklein/.platformio/packages/framework-arduinoespressif32/libraries/Wire/src",
                 ""
             ],
             "browse": {
                 "limitSymbolsToIncludedHeaders": true,
                 "path": [
                     "/Users/bernhardklein/Library/Mobile Documents/com~apple~CloudDocs/FPV/PODRacer_ESP32_FreeRTOS/src",
+                    "/Users/bernhardklein/Documents/Arduino/libraries/VL53L1X",
+                    "/Users/bernhardklein/.platformio/packages/framework-arduinoespressif32/libraries/Wire/src",
                     "/Users/bernhardklein/.platformio/packages/framework-arduinoespressif32/libraries/Preferences/src",
                     "/Users/bernhardklein/Documents/Arduino/libraries/TFMiniS/src",
                     "/Users/bernhardklein/Library/Mobile Documents/com~apple~CloudDocs/FPV/PODRacer_ESP32_FreeRTOS/.pio/libdeps/esp32dev/ESPAsyncWebServer/src",
@@ -555,7 +557,6 @@
                     "/Users/bernhardklein/Documents/Arduino/libraries/U8g2_for_Adafruit_GFX/src",
                     "/Users/bernhardklein/Documents/Arduino/libraries/U8g2_for_TFT_eSPI/src",
                     "/Users/bernhardklein/Documents/Arduino/libraries/VL53L0X",
-                    "/Users/bernhardklein/Documents/Arduino/libraries/VL53L1X",
                     "/Users/bernhardklein/Documents/Arduino/libraries/Vector/src",
                     "/Users/bernhardklein/Documents/Arduino/libraries/WebServer_ESP32_ENC/src",
                     "/Users/bernhardklein/Documents/Arduino/libraries/WebServer_ESP32_SC_ENC/src",
@@ -592,7 +593,6 @@
                     "/Users/bernhardklein/.platformio/packages/framework-arduinoespressif32/libraries/Update/src",
                     "/Users/bernhardklein/.platformio/packages/framework-arduinoespressif32/libraries/WiFiClientSecure/src",
                     "/Users/bernhardklein/.platformio/packages/framework-arduinoespressif32/libraries/WiFiProv/src",
-                    "/Users/bernhardklein/.platformio/packages/framework-arduinoespressif32/libraries/Wire/src",
                     ""
                 ]
             },

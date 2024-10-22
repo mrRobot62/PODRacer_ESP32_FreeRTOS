@@ -9,6 +9,8 @@ extern struct RECV_Struct RECV;
 
 SemaphoreHandle_t xMutex;
 
+
+
 void receiverTask(void *parameter) {
   // Beispiel: Setup für SBUS Empfang (angepasst auf deinen Empfänger)
   HardwareSerial sbusSerial(2); // UART2 für SBUS
