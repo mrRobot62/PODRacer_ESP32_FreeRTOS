@@ -7,6 +7,47 @@
 
 enum {OFF, ON};
 
+typedef struct __attribute__((packed)) {
+  // status pattern
+  // 0b0000 0000
+  //           |____ 0=starting mode, 1=ready
+  //          |_____ 0=disarmed, 1=armed
+  //
+  // bit 2-7 unused
+
+  uint8_t status_pattern = 0b0000000;  
+ 
+  // error_pattern
+  // 0b0000 0000
+  //           |____ Error in receiver task     (bit 0)
+  //          |_____ Error in mixer task        (bit 1)
+  //          ||____ Error in SurfaceTask       (bit 0+1)
+  //         |______ Error in OpticalFlow Task  (bit2)
+  //         ||_____ Error in HoverTask         (bit 1+2)
+  //        |_______ Error in SteeringTask      (bit 3)
+  //
+  // Bit 4-7 are used as indivudual task error indicator
+
+  uint8_t error_pattern = 0b00000000;
+
+  /**
+   * @brief set status mask. This neu state replace current state
+   * @param bit pattern
+   */
+  void setStatus(uint8_t mask) {
+    status_pattern = mask;
+  }
+
+  /**
+   * @brief set error mask. This mask will be "added" to current error stat (OR)
+   * @param mask: bit pattern
+   */
+  void setError(uint8_t mask) {
+    error_pattern |= mask;
+  }
+
+} TDataStatus;
+
 typedef struct __attribute__ ((packed)) {
   uint16_t channels[NUMBER_OF_CHANNELS] = {0};
   uint16_t gimbal_min = 1000;             // lowest gimbal value (calibrated)
@@ -56,6 +97,7 @@ typedef struct __attribute__ ((packed)) {
 } TDataGroup;
 
 typedef struct __attribute__ ((packed)) {
+  TDataStatus status;
   TDataGlobal global;
   TDataGroup  group;
   TDataRC     rc;

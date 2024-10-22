@@ -3,8 +3,21 @@
 #include <SPIFFS.h>
 #include "WebServerTask.h"
 #include <Preferences.h>
+#include "data_struct.h"
+
 //#include "ConfigManager.h"
 #include <ArduinoJson.h>  // Füge dies hinzu für DynamicJsonDocument
+
+// Access Point Einstellungen
+const char* ssid = "PODRacer_AP";
+const char* password = "12345678";
+
+// UDP Einstellungen
+WiFiUDP udp;
+const int udpPort = 4210;
+const char* udpBroadcastAddress = "192.168.4.255";  // Broadcast-Adresse für das ESP32-Netzwerk
+
+
 
 void WiFiEvent(WiFiEvent_t event);
 
@@ -15,6 +28,46 @@ AsyncWebServer server(80);
 //extern Preferences preferences;
 
 QueueHandle_t queueWebServer;
+
+// Funktionen
+void setupWiFiAP() {
+    Serial.println("Setting up Access Point...");
+    WiFi.softAP(ssid, password);
+    IPAddress IP = WiFi.softAPIP();
+    Serial.print("AP IP address: ");
+    Serial.println(IP);
+}
+
+template<typename T>
+void sendData(const T *data, size_t byteLength) {
+//    udp.beginPacket(udpBroadcastAddress, udpPort);
+//    udp.write((uint8_t*)&tdataAll, dataSize);
+//    udp.endPacket();
+}
+
+// Override for TDataRC
+template<>
+void sendData(const TDataRC *data, size_t byteLength) {
+
+}
+
+// Override for TDataOFlow
+template<>
+void sendData(const TDataOFlow *data, size_t byteLength) {
+
+}
+
+// Override for TDataSurface
+template<>
+void sendData(const TDataSurface *data, size_t byteLength) {
+
+}
+
+// Override for TDataStatus
+template<>
+void sendData(const TDataStatus *data, size_t byteLength) {
+
+}
 
 
 // Eine Liste von Beispiel-Namespaces (dynamisch erweiterbar)
@@ -95,6 +148,8 @@ void handleWifi(AsyncWebServerRequest *request) {
 }
 
 void webServerTask(void *parameter) {
+    TDataAll dataAll;
+
     // Deaktivieren des persistenten Speichers für WiFi-Einstellungen
     WiFi.persistent(false);
 
@@ -139,7 +194,12 @@ void webServerTask(void *parameter) {
 
     // FreeRTOS Task läuft permanent, ohne Aktion
     while (true) {
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        // Daten aus der Queue holen und senden
+        Serial.printf("Aktuelle dataAll-Size: %d | ", sizeof(dataAll));
+        if (xQueueReceive(queueWebServer, &dataAll, portMAX_DELAY) == pdTRUE) {
+            sendData(&dataAll, sizeof(dataAll));
+        }
+        vTaskDelay(100 / portTICK_PERIOD_MS);
     }
 }
 
