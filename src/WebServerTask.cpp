@@ -2,8 +2,10 @@
 #include <ESPAsyncWebServer.h>
 #include <SPIFFS.h>
 #include "WebServerTask.h"
+#include "ConfigManager.h"
 #include <Preferences.h>
 #include "data_struct.h"
+#include "FastCRC.h"
 
 //#include "ConfigManager.h"
 #include <ArduinoJson.h>  // Füge dies hinzu für DynamicJsonDocument
@@ -17,8 +19,6 @@ WiFiUDP udp;
 const int udpPort = 4210;
 const char* udpBroadcastAddress = "192.168.4.255";  // Broadcast-Adresse für das ESP32-Netzwerk
 
-
-
 void WiFiEvent(WiFiEvent_t event);
 
 // Globale Variablen für den Webserver
@@ -28,6 +28,9 @@ AsyncWebServer server(80);
 //extern Preferences preferences;
 
 QueueHandle_t queueWebServer;
+ConfigManager cm;
+
+FastCRC16 CRC16;
 
 // Funktionen
 void setupWiFiAP() {
@@ -40,9 +43,19 @@ void setupWiFiAP() {
 
 template<typename T>
 void sendData(const T *data, size_t byteLength) {
-//    udp.beginPacket(udpBroadcastAddress, udpPort);
-//    udp.write((uint8_t*)&tdataAll, dataSize);
-//    udp.endPacket();
+    uint16_t crc;
+    size_t buffer_length = sizeof(T);
+    char buffer[buffer_length + 2];         // +2 Bytes für CRC
+
+    udp.beginPacket(udpBroadcastAddress, udpPort);
+    cm.serializeData(data, buffer, &buffer_length);
+    // add CRC to buffer
+    crc = CRC16.ccitt(reinterpret_cast<uint8_t*>(buffer), buffer_length);
+    buffer[buffer_length] = crc & 0xFF;                 // low significant byte
+    buffer[buffer_length+1] = (crc >> 8) & 0xFF;        // most significant byte
+
+    udp.write((uint8_t*)buffer, buffer_length);
+    udp.endPacket();
 }
 
 // Override for TDataRC

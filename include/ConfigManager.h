@@ -113,7 +113,19 @@ public:
     }
 
 
+    // Generische Serialisierungsfunktion für jede Struktur
+    template <typename T>
+    void serializeData(const T& data, char* byteStream, size_t *byteLength) {
+        memcpy(byteStream, &data, sizeof(T));
+        *byteLength = sizeof(T);
+    }
 
+    // Generische Deserialisierungsfunktion für jede Struktur
+    template <typename T>
+    void deserializeData(const char* byteStream, T& data, size_t *byteLength) {
+        memcpy(&data, byteStream, sizeof(T));
+        *byteLength = sizeof(data);
+    }
 
 private:
     Preferences preferences;

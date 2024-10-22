@@ -85,7 +85,6 @@ typedef struct __attribute__ ((packed)) {
 } TDataOFlow;
 
 typedef struct __attribute__ ((packed)) {
-  uint8_t header;
   long start_millis;
   long end_millis;
   char fwversion[10];
@@ -97,13 +96,14 @@ typedef struct __attribute__ ((packed)) {
 } TDataGroup;
 
 typedef struct __attribute__ ((packed)) {
-  TDataStatus status;
+  uint8_t start = 0xFFEE;
   TDataGlobal global;
+  TDataStatus status;
   TDataGroup  group;
   TDataRC     rc;
   TDataSurface sdist;
   TDataOFlow  oflow;
-  uint16_t    crc;
+  uint8_t end = 0xEEFF;
 } TDataAll;
 
 
