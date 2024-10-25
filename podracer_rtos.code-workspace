@@ -4,5 +4,11 @@
 			"name": "PODRacer_ESP32_RTOS",
 			"path": "."
 		}
-	]
+	],
+	"settings": {
+		"files.associations": {
+			"*.simql": "simql",
+			"*.h_": "cpp"
+		}
+	}
 }

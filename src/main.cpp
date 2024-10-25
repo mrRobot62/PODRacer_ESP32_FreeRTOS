@@ -8,17 +8,28 @@
 #include "Preferences.h"
 #include "data_struct.h"
 #include "Logger.h"
-#include "RECVStruct.h" // Neu hinzufügen
+
+
+#define USE_MOCK_SBUS
+
+
 
 // komplettes löschen des esp32
 // python -m esptool --chip esp32 erase_flash
 
+// globale Task für die Kommunikation zwischen den Tasks
 
-RECV_Struct RECV;  // Dies ist die Definition der globalen Struktur
+QueueHandle_t tDataAllQueue;
+TDataAll globalData;
+
+ConfigManager globalCFG;
+
 extern Preferences preferences;
 
 void setup() {
   Serial.begin(115200);
+  globalCFG.initFlash(false);       // explizit KEIN komplettes Löschen des Flashes durchführen
+
 
   // ReceiverTask wird Core 0 zugewiesen (höchste Priorität)
   xTaskCreatePinnedToCore(receiverTask, "ReceiverTask", 4096, NULL, 2, NULL, 1);

@@ -6,6 +6,7 @@
 QueueHandle_t queueBlink;
 
 void blinkTask(void *parameter) {
+  BlinkController * controller;
   int receivedBlinkPattern;
   int newPattern = 0;
   while (1) {

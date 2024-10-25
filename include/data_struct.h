@@ -48,11 +48,17 @@ typedef struct __attribute__((packed)) {
 
 } TDataStatus;
 
+/**
+ * @brief Datenpunkte für den ReceiverTask
+ */
 typedef struct __attribute__ ((packed)) {
   uint16_t channels[NUMBER_OF_CHANNELS] = {0};
   uint16_t gimbal_min = 1000;             // lowest gimbal value (calibrated)
   uint16_t gimbal_max = 2000;             // largest gimbal value (calibrated)
   uint16_t gimbal_mid = 1500;             // center postion
+  bool fail_safe = false;
+  bool lost_frame = false;
+  bool is_armed; 
 } TDataRC;
 
 typedef struct __attribute__ ((packed)) {
@@ -96,15 +102,16 @@ typedef struct __attribute__ ((packed)) {
 } TDataGroup;
 
 typedef struct __attribute__ ((packed)) {
-  uint8_t start = 0xFFEE;
+  uint16_t start = 0xFFEE;
   TDataGlobal global;
   TDataStatus status;
   TDataGroup  group;
   TDataRC     rc;
   TDataSurface sdist;
   TDataOFlow  oflow;
-  uint8_t end = 0xEEFF;
+  uint16_t end = 0xEEFF;
 } TDataAll;
+
 
 
 extern TDataAll      dataAll;

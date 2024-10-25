@@ -50,7 +50,12 @@ public:
         this->loglevel = loglevel;
     }
 
-    void initFlash() {
+    /**
+     * @brief Initialisiert den Flashspeicher (kein Löschen)
+     * @param erase_flash default false, wenn true, wird der aktuell Flashspeicher gelöscht und reinitialisiert. 
+     *                  Achtung anschließen muss die Default-Struktur wieder hergestellt werden
+     */
+    void initFlash(bool erase_flash=false) {
         // NVS-Flash-Speicher initialisieren
         esp_err_t err = nvs_flash_init();
         if (err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND) {

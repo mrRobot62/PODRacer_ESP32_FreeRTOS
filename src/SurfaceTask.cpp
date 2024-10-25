@@ -3,7 +3,6 @@
 #include <PID_v1.h>
 #include <TFMini.h>
 #include "freertos/queue.h"
-#include "RECVStruct.h"  // Dies stellt sicher, dass die RECV_Struct-Definition bekannt ist
 
 // Globale RECV-Struktur extern einbinden
 extern struct RECV_Struct RECV;

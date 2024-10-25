@@ -34,18 +34,19 @@ class Logger {
     template<typename T>
     void info(const T &data, bool useUDP=true, bool cr=true) {
 
-        logSpecificData(data);
+        logSpecificData(data, 3, useUDP, cr);
     }
 
 
     private:
-        void logSpecificData(const TDataAll tdata);
-        void logSpecificData(const TDataRC tdata);
-        void logSpecificData(const TDataOFlow tdata);
-        void logSpecificData(const TDataSurface tdata);
-        void logSpecificData(const TDataStatus tdata);
+        void logSpecificData(const TDataAll tdata, uint8_t level, bool useUDP=true, bool cr=true);
+        void logSpecificData(const TDataRC tdata, uint8_t level, bool useUDP=true, bool cr=true);
+        void logSpecificData(const TDataOFlow tdata, uint8_t level, bool useUDP=true, bool cr=true);
+        void logSpecificData(const TDataSurface tdata, uint8_t level, bool useUDP=true, bool cr=true);
+        void logSpecificData(const TDataStatus tdata, uint8_t level, bool useUDP=true, bool cr=true);
 
     private:
+        char buffer[200];
         bool _useUDP = true;
 
 };
