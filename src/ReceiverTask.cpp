@@ -31,7 +31,7 @@ void receiverTask(void *parameter) {
     #endif
 
       receiver->read(&data);
-      logger->info(data);
+      logger->info(data, "RECV", "READ");
 
     // if (sbusSerial.available()) {
     //   if (xSemaphoreTake(xMutex, (TickType_t)10) == pdTRUE) {

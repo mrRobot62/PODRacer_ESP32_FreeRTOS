@@ -33,18 +33,18 @@ class Logger {
          * @param cr: default true, if set, a carriage return is explizit added to Serial.print statement. Ignored for UDP
          */
         template<typename T>
-        void info(const T &data, bool useUDP=false, bool cr=true) {
-
-            logSpecificData(data, 3, useUDP, cr);
+        void info(const T &data, const char* domain, const char* subdomain,bool useUDP=false, bool cr=true) {
+            // call the overloaded method based on parameter
+            logSpecificData(data, 3, domain, subdomain, useUDP, cr);
         }
 
 
-    private:
-        void logSpecificData(const TDataAll tdata, uint8_t level, bool useUDP=false, bool cr=true);
-        void logSpecificData(const TDataRC tdata, uint8_t level, bool useUDP=false, bool cr=true);
-        void logSpecificData(const TDataOFlow tdata, uint8_t level, bool useUDP=false, bool cr=true);
-        void logSpecificData(const TDataSurface tdata, uint8_t level, bool useUDP=false, bool cr=true);
-        void logSpecificData(const TDataStatus tdata, uint8_t level, bool useUDP=false, bool cr=true);
+    private:        
+        void logSpecificData(const TDataAll tdata,      uint8_t level, const char* domain, const char* subdomain,bool useUDP=false, bool cr=true);
+        void logSpecificData(const TDataRC tdata,       uint8_t level, const char* domain, const char* subdomain,bool useUDP=false, bool cr=true);
+        void logSpecificData(const TDataOFlow tdata,    uint8_t level, const char* domain, const char* subdomain,bool useUDP=false, bool cr=true);
+        void logSpecificData(const TDataSurface tdata,  uint8_t level, const char* domain, const char* subdomain,bool useUDP=false, bool cr=true);
+        void logSpecificData(const TDataStatus tdata,   uint8_t level, const char* domain, const char* subdomain,bool useUDP=false, bool cr=true);
 
     private:
         char buffer[200];

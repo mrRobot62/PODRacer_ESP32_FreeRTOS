@@ -18,11 +18,11 @@ class MockReceiverSBUS : public IReceiver {
                 previousMillis = currentMillis;
                 float v = calculateNextValue(this->midValue, (data->channels[15] / 1000.0));
                 for (uint8_t i=0; i < 4; i++) {
-                    data->channels[i] = constrain(uint16_t(v), 1000, 2000);
-                    Serial.printf("(%02d) CH: %d, V: %3.2f |", i, data->channels[i], v);
+                    data->channels[i] = constrain(uint16_t(v) + (i*15), 1000, 2000);
+                    //Serial.printf("|%02d:%d |", i, data->channels[i]);
                 }
                 data->channels[15] += uint16_t(0.1 * 1000);
-                Serial.printf("\n-- STEP: %4d, Channel15: %4d \n", uint16_t(v), data->channels[15]);
+                //Serial.printf("  STEP:%4d, CH15: %4d \n", uint16_t(v), data->channels[15]);
 
             }
     };
