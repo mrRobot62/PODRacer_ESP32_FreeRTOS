@@ -46,6 +46,6 @@ void receiverTask(void *parameter) {
     // }
     
     Serial.println("Receiver running...");
-    vTaskDelay(500 / portTICK_PERIOD_MS);
+    vTaskDelay(100 / portTICK_PERIOD_MS);
   }
 }

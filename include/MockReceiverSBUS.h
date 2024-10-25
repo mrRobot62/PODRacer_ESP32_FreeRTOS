@@ -2,21 +2,32 @@
 #define _MOCK_RECEIVERSBUS_H_
 
 #include "IReceiver.h"
-#include <cmath>  // Für die Sinusfunktion
+#include <math.h>  // Für die Sinusfunktion
 
 class MockReceiverSBUS : public IReceiver {
-    void read(TDataRC *data) {
-        // fülle Kanäle 0-3 (RPTY)
-        for (uint8_t i = 0; i < 4; i++) {
-            data->channels[i] = constrain(
-                uint16_t(
-                    calculateNextValue(data->channels[i], (data->channels[15] / step) )
-                ), 
-                1000, 2000);
+    public:
+        MockReceiverSBUS() {
+            this->currentMillis = millis();
         }
 
-        data->channels[15] += step;
+        void read(TDataRC *data) {
+            // fülle Kanäle 0-3 (RPTY)
+
+            // Prüfen, ob das Intervall seit dem letzten Update vergangen ist
+            if (currentMillis - previousMillis >= interval) {
+                previousMillis = currentMillis;
+                float v = calculateNextValue(this->midValue, (data->channels[15] / 1000.0));
+                for (uint8_t i=0; i < 4; i++) {
+                    data->channels[i] = constrain(uint16_t(v), 1000, 2000);
+                    Serial.printf("(%02d) CH: %d, V: %3.2f |", i, data->channels[i], v);
+                }
+                data->channels[15] += uint16_t(0.1 * 1000);
+                Serial.printf("\n-- STEP: %4d, Channel15: %4d \n", uint16_t(v), data->channels[15]);
+
+            }
     };
+
+
     void write(TDataRC *data){
 
     };
@@ -29,11 +40,21 @@ class MockReceiverSBUS : public IReceiver {
         const float midValue = 1500.0;  // Mittelwert
         const float frequency = 0.1;    // Frequenz für 10 Datenpunkte pro Sekunde
 
+        const unsigned long interval = 100; // Intervall in Millisekunden (100ms = 10x pro Sekunde)
+        unsigned long currentMillis = 0;
+
+        unsigned long previousMillis = 0;   // Zur Speicherung des letzten Aktualisierungszeitpunkts
+        float timeStep = 0.0;               // Zeitvariable für die Sinusberechnung
+
+
+
+
         // Funktion zur Berechnung des nächsten Wertes
         float calculateNextValue(float lastValue, float timeStep) {
             // Berechne den neuen Wert basierend auf der Sinusfunktion
-            return midValue + amplitude * std::sin(2 * M_PI * frequency * timeStep);
+            return midValue + amplitude * sin(2 * PI * frequency * timeStep);
         }
+
 
 };
 
