@@ -10,8 +10,6 @@
 #include "Logger.h"
 
 
-#define USE_MOCK_SBUS
-
 
 
 // komplettes löschen des esp32
@@ -22,6 +20,8 @@
 QueueHandle_t tDataAllQueue;
 TDataAll globalData;
 
+Logger *logger;
+
 ConfigManager globalCFG;
 
 extern Preferences preferences;
@@ -29,6 +29,8 @@ extern Preferences preferences;
 void setup() {
   Serial.begin(115200);
   globalCFG.initFlash(false);       // explizit KEIN komplettes Löschen des Flashes durchführen
+
+  logger = new Logger(&Serial, 115200, 3);
 
 
   // ReceiverTask wird Core 0 zugewiesen (höchste Priorität)

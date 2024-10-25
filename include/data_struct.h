@@ -2,6 +2,7 @@
 #define _DATA_STRUCT_H_
 
 #include <Arduino.h>
+#include "globals.h"
 
 #define NUMBER_OF_CHANNELS 16
 

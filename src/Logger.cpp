@@ -8,6 +8,8 @@ void Logger::logSpecificData(const TDataAll tdata, uint8_t level, bool useUDP, b
 void Logger::logSpecificData(const TDataRC tdata, uint8_t level, bool useUDP, bool cr) {
     char lString[5+1];
     char state[3+1];
+    char crlf = ' ';
+
     switch (level) {
         case 1 : // error
             strcpy (lString, "ERROR");
@@ -32,15 +34,17 @@ void Logger::logSpecificData(const TDataRC tdata, uint8_t level, bool useUDP, bo
     else {
         strcpy(state,"DIS");
     }
-
-    sprintf(buffer, "%5s|%5s|%1d|%04d, %04d, %04d, %04d, %04d, %04d, %04d|%1d|%1d|",
+    crlf = ' ';
+    if (cr) crlf = '\n';
+    sprintf(buffer, "%5s|%5s|%1d|%04d, %04d, %04d, %04d, %04d, %04d, %04d|%1d|%1d|%c",
         lString, "RECV", 
         tdata.channels[0],tdata.channels[1],tdata.channels[2],tdata.channels[3],
         tdata.channels[4],tdata.channels[5],tdata.channels[6],tdata.channels[7],
-        tdata.lost_frame, tdata.fail_safe
+        tdata.lost_frame, tdata.fail_safe,
+        crlf
     );
-    Serial.print(buffer);
 
+    Serial.print(buffer);
 }
 
 void Logger::logSpecificData(const TDataOFlow tdata, uint8_t level, bool useUDP, bool cr) {

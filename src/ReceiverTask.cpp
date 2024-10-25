@@ -6,7 +6,7 @@
 #include "freertos/semphr.h"
 
 SemaphoreHandle_t xMutex;
-TReceiverData data;
+TDataRC data;
 
 #define SBUS_RX 16
 #define SBUS_TX 17
@@ -22,24 +22,30 @@ void receiverTask(void *parameter) {
   // dadurch haben wir die Möglichkeit problemlos auch Mock-Klassen zu compilieren
   IReceiver *receiver;
 
+  memset(&data, 0, sizeof(data));
   while (1) {
     #ifdef USE_MOCK_SBUS
-      receiver = new MockReceiverSBUS()
+      receiver = new MockReceiverSBUS();
     #else
       receiver = new ReceiverSBUS(&hsBus2, SBUS_RX, SBUS_TX );
     #endif
-    if (sbusSerial.available()) {
-      if (xSemaphoreTake(xMutex, (TickType_t)10) == pdTRUE) {
-        // Empfange SBUS-Daten und schreibe in die globale RECV-Struktur
-        for (int i = 0; i < 16; i++) {
-          data.channel[i] = sbusSerial.read();  // Beispiel-Daten (echte Dekodierung implementieren)
-        }
-        xSemaphoreGive(xMutex);
-      }
 
-    }
+      receiver->read(&data);
+      logger->info(data);
+
+    // if (sbusSerial.available()) {
+    //   if (xSemaphoreTake(xMutex, (TickType_t)10) == pdTRUE) {
+    //     // Empfange SBUS-Daten und schreibe in die globale RECV-Struktur
+    //       memset(&data, 0, sizeof(data));
+    //       receiver->read(&data);
+    //       logger->info(data);
+    //     }
+    //     xSemaphoreGive(xMutex);
+    //   }
+
+    // }
     
     Serial.println("Receiver running...");
-    vTaskDelay(2500 / portTICK_PERIOD_MS);
+    vTaskDelay(500 / portTICK_PERIOD_MS);
   }
 }

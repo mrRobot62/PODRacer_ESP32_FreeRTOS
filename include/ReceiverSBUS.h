@@ -26,8 +26,6 @@ public:
     // Methode zum Senden der SBUS-Daten
     void write(TDataRC *data) override ;
 
-    // Zugriff auf Daten
-    TDataRC getData() override { return rcData; }
 };
 
 #endif // RECEIVERSBUS_H

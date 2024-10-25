@@ -17,38 +17,41 @@
   ((d) & 0x01 ? '1' : '0') 
 
 class Logger {
-    Logger(HardwareSerial *bus, int baud=115200, uint8_t level=3) {
-        this->_useUDP = true;
-    };
+    public:
+        Logger(HardwareSerial *bus, int baud=115200, uint8_t level=3) {
+            this->_useUDP = true;
+        };
 
-    void setUDPLog(bool useUDP=true) {
-        this->_useUDP = useUDP;
-    }
+        void setUDPLog(bool useUDP=true) {
+            this->_useUDP = useUDP;
+        }
 
-    /**
-     * @brief generic info method, print all stuff used by all data structs
-     * @param data : data struct to log
-     * @param useUDP: default true, if true, send bytestream to host computer
-     * @param cr: default true, if set, a carriage return is explizit added to Serial.print statement. Ignored for UDP
-     */
-    template<typename T>
-    void info(const T &data, bool useUDP=true, bool cr=true) {
+        /**
+         * @brief generic info method, print all stuff used by all data structs
+         * @param data : data struct to log
+         * @param useUDP: default false, if true, send bytestream to host computer
+         * @param cr: default true, if set, a carriage return is explizit added to Serial.print statement. Ignored for UDP
+         */
+        template<typename T>
+        void info(const T &data, bool useUDP=false, bool cr=true) {
 
-        logSpecificData(data, 3, useUDP, cr);
-    }
+            logSpecificData(data, 3, useUDP, cr);
+        }
 
 
     private:
-        void logSpecificData(const TDataAll tdata, uint8_t level, bool useUDP=true, bool cr=true);
-        void logSpecificData(const TDataRC tdata, uint8_t level, bool useUDP=true, bool cr=true);
-        void logSpecificData(const TDataOFlow tdata, uint8_t level, bool useUDP=true, bool cr=true);
-        void logSpecificData(const TDataSurface tdata, uint8_t level, bool useUDP=true, bool cr=true);
-        void logSpecificData(const TDataStatus tdata, uint8_t level, bool useUDP=true, bool cr=true);
+        void logSpecificData(const TDataAll tdata, uint8_t level, bool useUDP=false, bool cr=true);
+        void logSpecificData(const TDataRC tdata, uint8_t level, bool useUDP=false, bool cr=true);
+        void logSpecificData(const TDataOFlow tdata, uint8_t level, bool useUDP=false, bool cr=true);
+        void logSpecificData(const TDataSurface tdata, uint8_t level, bool useUDP=false, bool cr=true);
+        void logSpecificData(const TDataStatus tdata, uint8_t level, bool useUDP=false, bool cr=true);
 
     private:
         char buffer[200];
         bool _useUDP = true;
 
 };
+
+extern Logger *logger;
 
 #endif
