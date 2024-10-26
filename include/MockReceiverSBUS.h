@@ -11,25 +11,33 @@ class MockReceiverSBUS : public IReceiver {
         }
 
         void read(TDataRC *data) {
+            currentMillis = millis();
             // fülle Kanäle 0-3 (RPTY)
+                // Serial.printf("Mock:read() cms: %d, pms: %d, interv: %d \n",
+                //     currentMillis,
+                //     previousMillis,
+                //     interval
+                // );
 
             // Prüfen, ob das Intervall seit dem letzten Update vergangen ist
             if (currentMillis - previousMillis >= interval) {
                 previousMillis = currentMillis;
-                float v = calculateNextValue(this->midValue, (data->channels[15] / 1000.0));
+                float v = calculateNextValue(this->midValue, (data->raw_channels[15] / 1000.0));
                 for (uint8_t i=0; i < 4; i++) {
-                    data->channels[i] = constrain(uint16_t(v) + (i*15), 1000, 2000);
-                    //Serial.printf("|%02d:%d |", i, data->channels[i]);
+                    data->raw_channels[i] = constrain(uint16_t(v) + (i*15), 1000, 2000);
                 }
-                data->channels[15] += uint16_t(0.1 * 1000);
-                //Serial.printf("  STEP:%4d, CH15: %4d \n", uint16_t(v), data->channels[15]);
-
+                data->raw_channels[15] += uint16_t(0.1 * 1000);
+                data->fail_safe = false;
+                data->lost_frame = false;
+                data->is_armed = true;
+                
             }
     };
 
 
     void write(TDataRC *data){
-
+        // Simulation, das das schreiben etwas dauert
+        vTaskDelay(2 / portTICK_PERIOD_MS);
     };
 
 

@@ -36,10 +36,12 @@ void Logger::logSpecificData(const TDataRC tdata, uint8_t level, const char* dom
     }
     crlf = ' ';
     if (cr) crlf = '\n';
-    sprintf(buffer, "%5s|%5s|%5s|%1d|%04d, %04d, %04d, %04d, %04d, %04d, %04d|%1d|%1d|%c",
-        lString, domain, subdomain, 
-        tdata.channels[0],tdata.channels[1],tdata.channels[2],tdata.channels[3],
-        tdata.channels[4],tdata.channels[5],tdata.channels[6],tdata.channels[7],
+    //  <ms>|<level>|<domain>|<subd>|<armed>|RAW: 6values|NEW: 6values...
+    // "%5s|%5s|%5s|%1d|...
+    sprintf(buffer, "%8d|%5s|%5s|%5s|%1d|RAW: %04d %04d %04d %04d %04d %04d|NEW: %04d %04d %04d %04d %04d %04d|%1d|%1d|%c",
+        this->current_millis, lString, domain, subdomain, tdata.is_armed,
+        tdata.raw_channels[0],tdata.raw_channels[1],tdata.raw_channels[2],tdata.raw_channels[3],tdata.raw_channels[4],tdata.raw_channels[5],
+        tdata.new_channels[0],tdata.new_channels[1],tdata.new_channels[2],tdata.new_channels[3],tdata.new_channels[4],tdata.new_channels[5],
         tdata.lost_frame, tdata.fail_safe,
         crlf
     );

@@ -8,7 +8,10 @@
 	"settings": {
 		"files.associations": {
 			"*.simql": "simql",
-			"*.h_": "cpp"
+			"*.h_": "cpp",
+			"array": "cpp",
+			"string": "cpp",
+			"string_view": "cpp"
 		}
 	}
 }
