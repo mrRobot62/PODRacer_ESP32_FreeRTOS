@@ -1,4 +1,7 @@
-# Prerequisites
+.pio/
+
+
+ Prerequisites
 *.d
 
 # Object files
