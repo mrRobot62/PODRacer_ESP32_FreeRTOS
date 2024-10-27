@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WiFi Settings</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="container">
+    <h1 class="text-center my-4">WiFi Configuration</h1>
+
+    <div class="form-group">
+        <div class="form-check">
+            <input class="form-check-input" type="radio" id="ap" name="mode" value="AP" checked>
+            <label class="form-check-label" for="ap">AP-Mode</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" id="wpa" name="mode" value="WPA">
+            <label class="form-check-label" for="wpa">WPA-Mode</label>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="ssid">SSID:</label>
+        <select id="ssid" class="form-control" disabled>
+            <!-- Dynamically filled with available SSIDs -->
+        </select>
+    </div>
+
+    <div class="form-group">
+        <input type="text" id="selectedSSID" class="form-control" placeholder="Selected SSID" disabled>
+    </div>
+
+    <div class="form-group">
+        <label for="password">Password:</label>
+        <input type="password" id="password" class="form-control" placeholder="Enter Password" disabled>
+    </div>
+
+    <div class="text-center">
+        <button id="connectBtn" class="btn btn-primary" disabled>Connect</button>
+    </div>
+
+    <script>
+        document.getElementsByName("mode").forEach((element) => {
+            element.addEventListener("change", function() {
+                if (this.value === "WPA") {
+                    document.getElementById("ssid").disabled = false;
+                    document.getElementById("selectedSSID").disabled = false;
+                    document.getElementById("password").disabled = false;
+                    document.getElementById("connectBtn").disabled = false;
+                } else {
+                    document.getElementById("ssid").disabled = true;
+                    document.getElementById("selectedSSID").disabled = true;
+                    document.getElementById("password").disabled = true;
+                    document.getElementById("connectBtn").disabled = true;
+                }
+            });
+        });
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
