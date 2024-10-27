@@ -43,10 +43,13 @@ class Logger {
     private:        
         void logSpecificData(const TDataAll tdata,      uint8_t level, const char* domain, const char* subdomain, bool useUDP=false, bool cr=true);
         void logSpecificData(const TDataRC tdata,       uint8_t level, const char* domain, const char* subdomain, bool useUDP=false, bool cr=true);
-        void logSpecificData(const TDataOFlow tdata,    uint8_t level, const char* domain, const char* subdomain, bool useUDP=false, bool cr=true);
+        void logSpecificData(const TDataHover tdata,    uint8_t level, const char* domain, const char* subdomain, bool useUDP=false, bool cr=true);
         void logSpecificData(const TDataSurface tdata,  uint8_t level, const char* domain, const char* subdomain, bool useUDP=false, bool cr=true);
         void logSpecificData(const TDataStatus tdata,   uint8_t level, const char* domain, const char* subdomain, bool useUDP=false, bool cr=true);
 
+    private:
+        void getLogLevelString(char *level_str, uint8_t level);
+        void getArmingString(char *arm_str, uint8_t level, const char* TRUE="ARM", const char* FALSE="DIS");      
     private:
         long current_millis;
         char buffer[200];

@@ -11,8 +11,6 @@ TFMini tfmini;
 QueueHandle_t queueDistance;
 
 void surfaceTask(void *parameter) {
-  // TFMini-Plus Sensor initialisieren
-  //tfmini.begin(&Serial1);
 
   double distance;
     queueDistance = xQueueCreate(10, sizeof(int));

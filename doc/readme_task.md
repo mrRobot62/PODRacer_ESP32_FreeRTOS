@@ -37,12 +37,47 @@ liest aus er `queueReceiver` eine Datenstruktur `TDataAll` und liest die new_cha
 
 ## HoverTask
 ### Beschreibung
+Der HoverTask ist dafür verantwortlich um den PODRacer in eine stabile Schwebeposition zu halten. Hierzu nutzt er den OpticalFlow Sensor PMW3901 und wertet seine Driftbewegung
+in X/Y Richtung aus und berechnet daraus eine relative Roll/Pitch bewegung.
+Der HoverTask rechnet nur dann, wenn Thrust (Impeller) auf 0 steht. Sobald der Pilot den Gimbal bewegt, ignoriert der Hover alle PMW3901 Ausgaben.
 
-### genutzte Sensoren
+
+
+ ### genutzte Sensoren
+Genutzt wird der PMW3901 Sensor. Dieser Sensor liefert ein X/Y Signal zurück, das eine Driftbewegung definiert.
+Nachfolgend eine Beschreibung wie sich X/YWerte darstellen und entsprechend ausgewertet werden.
+
+
+          <NORTH>
+            -Y
+            |
+      +X-Y  |  -X-Y
+    +X -----|------- -X
+      +X+Y  |  -X+Y 
+            |
+            +Y
+        <SOUTH>
+
+Driftet der PODRacer z.B. nach rechts (OST), wird X kleiner, Y bleibt bei 0. Der PODRacer muss also gegensteuern und eine ROLL-Bewegung nach links (ROLL < 1500) machen.
+Driftet der PODRacer z.B  nach rechts-oben (NORD-OST), X und Y verkleinern sich, Reaktion des PODRacers, PITCH < 1500, ROLL < 1500. Der PODRacer hebt etwas die Nase und kippt leicht nach links
+
 
 ### Input Daten
+Der Sensor PMW3901 nutzt nachfolgende Struktur 
+```
+ typedef struct {
+    double raw_x = 0.0;
+    double raw_y = 0.0;
+    double normalized_X = 0.0;
+    double normalized_Y = 0.0;
+    double setPointX = 0.0;
+    double setPointY = 0.0;
+} TSensorPMW3901;
+```
+Nur `setPointX` und `setPointY` sind relevant und stellen den SOLL-Wert für X und Y dar. In der Regel liegt der bei 0.0
 
 ### Output Daten
+Zurück gegeben wird eine berechneter Wert für X+Y und wird in `raw_x` und `raw_y` gespeichert.
 
 ### Besondere Informationen zum Task
 

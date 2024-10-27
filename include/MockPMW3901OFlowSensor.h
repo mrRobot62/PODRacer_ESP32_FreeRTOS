@@ -3,17 +3,23 @@
 
 #include "ISensor.h"
 
-class PMW3901OFlowSensor : public ISensor {
-    PMW3901OFlowSensor();
-    ~PMW3901OFlowSensor() override {};
+class MockPMW3901OFlowSensor : public ISensor<TSensorPMW3901> {
+    public:
+        MockPMW3901OFlowSensor() {};
+        ~MockPMW3901OFlowSensor() override {};
 
-    void sensorInit() override; // Initialisierung des Sensors
-    void update() override; // Aktualisiert die Sensordaten
+        virtual void update(TSensorPMW3901 &sensorData) override {
 
-    double getDistance() override; // Gibt die tatsächliche gemessene Distanz zurück
-    double getNormalizedDistance() override; // Gibt die normierte Distanz zurück
+        }
 
-    void setTargetDistance(double targetDistance) override; // Setzt die Soll-Distanz
+        virtual void sensorInit(TSensorPMW3901 &sensorData) override {
+
+        }
+    
+    private:
+        
+
+
 };
 
 #endif

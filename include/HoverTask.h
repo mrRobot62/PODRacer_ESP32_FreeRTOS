@@ -3,7 +3,9 @@
 
 #include <Arduino.h>
 #include "data_struct.h"
+#include "HoverController.h"
 #include "Logger.h"
+
 
 void HoverTask(void *parameter);
 
