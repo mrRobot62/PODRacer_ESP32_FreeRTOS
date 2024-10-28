@@ -16,6 +16,28 @@
 
 enum {OFF, ON};
 
+//---------------------------------------------------------------
+//  Channels Belegung 
+//---------------------------------------------------------------
+#define ROLL 0
+#define PITCH 1
+#define THRUST 2
+#define YAW 3
+#define THROTTLE 4      // über POTI
+#define HOVER 4         // Alias für THROTTLE - über POTI
+#define ARMING 5        //
+
+//---------------------------------------------------------------
+
+typedef struct {
+  uint16_t minGimbal = 1000;
+  uint16_t maxGimbal = 2000;
+  uint16_t midGimbal = 1500;
+  uint8_t gimbalNoise = 5;      // wird als Range genutzt um den Mittelwert nicht als absoluten Wert zu nutzen
+  
+
+} TGlobalDefaultValues;
+
 typedef struct __attribute__((packed)) {
   // status pattern
   // 0b0000 0000
