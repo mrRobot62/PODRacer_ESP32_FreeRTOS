@@ -16,6 +16,8 @@
   ((d) & 0x02 ? '1' : '0'), \
   ((d) & 0x01 ? '1' : '0') 
 
+
+
 class Logger {
     public:
         Logger(HardwareSerial *bus, int baud=115200, uint8_t level=3) {
@@ -49,7 +51,7 @@ class Logger {
 
     private:
         void getLogLevelString(char *level_str, uint8_t level);
-        void getArmingString(char *arm_str, uint8_t level, const char* TRUE="ARM", const char* FALSE="DIS");      
+        void getBoolString(char *arm_str, uint8_t level, const char* TRUE="ARM", const char* FALSE="DIS");      
     private:
         long current_millis;
         char buffer[200];

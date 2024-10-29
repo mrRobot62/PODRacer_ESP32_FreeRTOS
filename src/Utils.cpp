@@ -11,3 +11,4 @@ bool isLowerAs(uint16_t current, uint16_t target, uint8_t range) {
 bool isHigherAs(uint16_t current, uint16_t target, uint8_t range) {
     return (current >= (target - range));
 }
+

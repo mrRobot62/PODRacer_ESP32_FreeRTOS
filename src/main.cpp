@@ -7,6 +7,7 @@
 #include "WebServerTask.h"
 #include "Preferences.h"
 #include "data_struct.h"
+#include "globals.h"
 #include "Logger.h"
 
 // ************************************************************************************************************
@@ -58,6 +59,34 @@ QueueHandle_t queueSteering;
 TDataAll globalData;
 SemaphoreHandle_t xTDataAllMutex;
 EventGroupHandle_t xEventGroup;
+
+//
+// Logging-Pattern, detaillierte Beschreibung siehe readme_logging.md.
+// Bit 7 ist generell für loggen ON(1)/OFF(0), Bit 6-0 sind indivduell
+uint8_t LOG_MASK_RECEIVER   = 0b11000000;       // B6 = READ, B5=WRITE
+uint8_t LOG_MASK_MIXER      = 0b01110000;       //
+uint8_t LOG_MASK_SURFACE    = 0b01100000;       //
+uint8_t LOG_MASK_HOVER      = 0b01100000;       //
+
+
+//uint8_t MOCK_DATA_MASK_SBUS     =0b00000001;    // Verhalten 1, mehr Details siehe readme_mock.md
+uint8_t MOCK_DATA_MASK_SBUS     =0b00000010;    // Verhalten 2, mehr Details siehe readme_mock.md
+//uint8_t MOCK_DATA_MASK_SBUS     =0b00000100;    // Verhalten 3, mehr Details siehe readme_mock.md
+//uint8_t MOCK_DATA_MASK_SBUS     =0b00001000;    // Verhalten 4, mehr Details siehe readme_mock.md
+//uint8_t MOCK_DATA_MASK_SBUS     =0b00010000;    // Verhalten 5, mehr Details siehe readme_mock.md
+//uint8_t MOCK_DATA_MASK_SBUS     =0b00100000;    // Verhalten 6, mehr Details siehe readme_mock.md
+//uint8_t MOCK_DATA_MASK_SBUS     =0b01000000;    // Verhalten 7, mehr Details siehe readme_mock.md
+//uint8_t MOCK_DATA_MASK_SBUS     =0b10000000;    // Verhalten 8, mehr Details siehe readme_mock.md
+
+
+uint8_t MOCK_DATA_MASK_PMW3901  =0b00000001;
+uint8_t MOCK_DATA_MASK_TFMINI   =0b00000001;
+uint8_t MOCK_DATA_MASK_VL53X1   =0b00000001;
+uint8_t MOCK_DATA_MASK_HOVER    =0b00000001;
+uint8_t MOCK_DATA_MASK_SURFACE  =0b00000001;
+uint8_t MOCK_DATA_MASK_MIXER    =0b00000001;
+
+
 
 void setup() {
   Serial.begin(115200);

@@ -30,10 +30,10 @@ void Logger::getLogLevelString(char *level_str, uint8_t level) {
 }
 
 
-void Logger::getArmingString(char *arm_str, uint8_t level, const char* TRUE, const char* FALSE) {
+void Logger::getBoolString(char *arm_str, uint8_t level, const char* TRUE, const char* FALSE) {
     // Initialisierung der Zeiger auf konstante Log-Level-Strings
     const char *str;
-    const size_t len = 3; // Feste Länge von 5 Zeichen
+    const size_t len = 3; // Feste Länge von 3 Zeichen
 
     switch (level) {
         case 0:
@@ -63,8 +63,8 @@ void Logger::logSpecificData(const TDataRC tdata, uint8_t level, const char* dom
     char crlf = ' ';
 
     this->getLogLevelString(lString, level);
-    this->getArmingString(arm, tdata.is_armed);
-    this->getArmingString(prevent, tdata.is_armed, "YES","NOT");
+    this->getBoolString(arm, tdata.is_armed);
+    this->getBoolString(prevent, tdata.prevent_arming, "YES","NO ");
 
     // <ms>|<level>|<domain>|<armed>|ch0-ch7|<lost_frame|<faile_safe|<cr>
     // 000000|INFO|10s|0/1|0000,0000,0000,...|0/1|0/1|
@@ -75,8 +75,8 @@ void Logger::logSpecificData(const TDataRC tdata, uint8_t level, const char* dom
     // "%5s|%5s|%5s|%1d|...
     sprintf(buffer, "%8d|%5s|%5s|%5s|%3s|%3s|RAW: %04d %04d %04d %04d %04d %04d|NEW: %04d %04d %04d %04d %04d %04d|%1d|%1d|%c",
         this->current_millis, lString, domain, subdomain, arm,prevent,
-        tdata.raw_channels[0],tdata.raw_channels[1],tdata.raw_channels[2],tdata.raw_channels[3],tdata.raw_channels[4],tdata.raw_channels[5],
-        tdata.new_channels[0],tdata.new_channels[1],tdata.new_channels[2],tdata.new_channels[3],tdata.new_channels[4],tdata.new_channels[5],
+        tdata.raw_channels[ROLL],tdata.raw_channels[PITCH],tdata.raw_channels[YAW],tdata.raw_channels[THROTTLE],tdata.raw_channels[THRUST],tdata.raw_channels[ARMING],
+        tdata.new_channels[ROLL],tdata.new_channels[PITCH],tdata.new_channels[YAW],tdata.new_channels[THROTTLE],tdata.new_channels[THRUST],tdata.new_channels[ARMING],
         tdata.lost_frame, tdata.fail_safe,
         crlf
     );

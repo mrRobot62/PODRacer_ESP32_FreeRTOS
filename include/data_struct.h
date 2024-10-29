@@ -28,6 +28,17 @@ enum {OFF, ON};
 #define ARMING 5        //
 
 //---------------------------------------------------------------
+/**
+ * @brief Nur für zusätzliche Loginformationen die über denen einer TDataXYZ-Struct hinaus gehen
+ * @param doubles: Array von maximal drei double-Werten
+ * @param ints: Array von maximal drei 16Bit Integer Werten
+ * @param messages: Array von drei zusätzlichen String nachrichten. Diese sollte nicht länger als 15 Bytes sein (sonst nicht mehr lesbar im Terminal)
+ */
+typedef struct {
+  double doubles[3];
+  uint16_t ints[3];
+  String messages[3];
+} TLogAdditionals;
 
 typedef struct {
   uint16_t minGimbal = 1000;

@@ -18,7 +18,7 @@ Jeder Task hat eine eigene uint8_t Bitmaske zur Verfügung. Generell gilt, wenn 
 | Receiver | Logging ON | READ | WRITE | Free | Free | Free | Free | Free | Logging ReceiverTask, Zwei Methoden read(), write() die unterschiedlich loggen können              |
 | Hover    | Logging ON | RAW  | CALC  | Free | Free | Free | Free | Free | Logging HoverTask, RAW sind nur die Eingangswerte, CALC sind die berechneten Werte aus dem PMW3901 |
 | Surface  | Logging ON | RAW  | CALC  | Free | Free | Free | Free | Free | Logging aus SurfaceTask,                                                                           |
-| Mixer    | Logging ON | S1   | S2    | S3   | S4   | Free | Free | Free | Logging MixerTask, S1(STep1), S2(Step2), ...                                                       |
+| Mixer    | Logging ON | S1   | S2    | S3   | S4   | Free | Free | Free | Logging MixerTask, S1(ReceiverIN), S2(), ...                                                       |
 |          |            |      |       |      |      |      |      |      |                                                                                                    |
 |          |            |      |       |      |      |      |      |      |                                                                                                    |
 

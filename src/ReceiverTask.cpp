@@ -29,33 +29,38 @@ void receiverTask(void *parameter) {
   
   //
   // lokaler Datenspeicher für RC-daten
-  TDataRC rcData;
-  TDataHover hoverData;
+  TDataRC *rcData;
+  TDataHover *hoverData;
 
   Serial.println("Receiver running...");
   #ifdef USE_MOCK_SBUS
-    receiver = new MockReceiverSBUS();
+    receiver = new MockReceiverSBUS(MOCK_DATA_MASK_SBUS); // in main.cpp kann nach bedarf MOCK_DATA_MASK_SBUS angepasst werden
   #else
     receiver = new ReceiverSBUS(&hsBus2, SBUS_RX, SBUS_TX );
   #endif
   while (1) {
+    rcData = new TDataRC();
+    hoverData = new TDataHover();
     // immer den Receiver auslesen
-    receiver->read(&rcData);
+    //Serial.printf("RECEIVER rcData: %d, %d, %d", rcData->gimbal_max, rcData->gimbal_mid, rcData->gimbal_min);
+    receiver->read(rcData);
     // raw_channel daten in Hover-Struktur kopieren
-    memcpy(hoverData.raw_channels, rcData.raw_channels, sizeof(hoverData.raw_channels));
+    memcpy(hoverData->raw_channels, rcData->raw_channels, sizeof(hoverData->raw_channels));
     //
     // wenn Mutex verfügbar, dann in Queue schreiben
     if (xSemaphoreTake(xReceiverMutex, (TickType_t)10) == pdTRUE) {
       // Daten in Queue senden
-      xQueueSend(queueReceiver, &rcData, portMAX_DELAY);
-      xQueueSend(queueHover, &hoverData, portMAX_DELAY);
+      xQueueSend(queueReceiver, rcData, portMAX_DELAY);
+      xQueueSend(queueHover, hoverData, portMAX_DELAY);
       
       // Mutex freigeben
       xSemaphoreGive(xReceiverMutex);
-      logger->info(rcData, "RECV", "READ");
+      if (bitRead(LOG_MASK_RECEIVER, LOGGING_BIT) && bitRead(LOG_MASK_RECEIVER, LOGGING_RECV_READ)) {
+        logger->info(*rcData, "RECV", "READ");
+      }
     }    
     // reset rcData
-    memset(&rcData, 0, sizeof(rcData));
+    memset(rcData, 0, sizeof(&rcData));
     // ab hier beginnt der WRITE-Teil des ReceiverTasks
     // wir prüfen ob ein Event-Bit vom Mixer gesetzt wurde, wenn ja, dann
     // liest der ReceiverTask die global TDataAll Struktur und schreibt die Daten
@@ -67,11 +72,16 @@ void receiverTask(void *parameter) {
       if (xSemaphoreTake(xTDataAllMutex, (TickType_t)10) == pdTRUE) {
           receiver->write(&globalData.rc);
           xSemaphoreGive(xTDataAllMutex);
-          logger->info(globalData.rc, "RECV", "WRITE");
+          if (bitRead(LOG_MASK_RECEIVER, LOGGING_BIT) && bitRead(LOG_MASK_RECEIVER, LOGGING_RECV_WRITE)) {
+            logger->info(globalData.rc, "RECV", "WRITE");
+          }
           // Lösche das Ereignisbit, nachdem die Aktion abgeschlossen ist
           xEventGroupClearBits(xEventGroup, BIT_RECEIVER);
        }
     }
+    delete(rcData);
+    delete(hoverData);
+
     vTaskDelay(LOOP_TIME / portTICK_PERIOD_MS);
   }
 }

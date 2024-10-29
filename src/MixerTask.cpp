@@ -32,26 +32,40 @@ void mixerTask(void *parameter) {
     // am Ende führt er ein Update der globael TDataAll Struktur durch
     // und setzt folgende EventBits: BIT_RECEIVER | BIT_WEBSERVER
     //
+
+    // ReceiverTask auslesen
     if (xQueueReceive(queueReceiver, &rcData, 0) == pdPASS) {
         xSemaphoreTake(xTDataAllMutex, portMAX_DELAY);
         globalData.rc = rcData;
         xSemaphoreGive(xTDataAllMutex);
     }
     // nur für test
-    memcpy(rcData.new_channels, rcData.raw_channels, sizeof(rcData.new_channels));
-    logger->info(rcData, "MIXER","S1");
+    if (bitRead(LOG_MASK_MIXER, LOGGING_BIT) && bitRead(LOG_MASK_MIXER, LOGGING_MIX_S1)) {
+      memcpy(rcData.new_channels, rcData.raw_channels, sizeof(rcData.new_channels));
+      logger->info(rcData, "MIXER","S1");
+    }
+
+    // HoverTask auslesen
+    if (xQueueReceive(queueHover, &hoverData, 0) == pdPASS) {
+      xSemaphoreTake(xTDataAllMutex, portMAX_DELAY);
+      globalData.hover = hoverData;
+      xSemaphoreGive(xTDataAllMutex);
+    }  
+    if (globalData.hover.prevent_arming) {
+
+    }
+    // nur für test
+    if (bitRead(LOG_MASK_MIXER, LOGGING_BIT) && bitRead(LOG_MASK_MIXER, LOGGING_MIX_S2)) {
+      memcpy(rcData.new_channels, rcData.raw_channels, sizeof(rcData.new_channels));
+      logger->info(rcData, "MIXER","S2");
+    }
 
     if (xQueueReceive(queueSurface, &surfaceData, 0) == pdPASS) {
         xSemaphoreTake(xTDataAllMutex, portMAX_DELAY);
         globalData.sdist = surfaceData;
         xSemaphoreGive(xTDataAllMutex);
     }
-
-    if (xQueueReceive(queueHover, &hoverData, 0) == pdPASS) {
-      xSemaphoreTake(xTDataAllMutex, portMAX_DELAY);
-      globalData.hover = hoverData;
-      xSemaphoreGive(xTDataAllMutex);
-    }   
+ 
 
 
 
@@ -75,6 +89,11 @@ void mixerTask(void *parameter) {
           oFlowData.prevent_arming |
           steeringData.prevent_arming;
 
+        if (globalData.global.prevent_ariming) {
+          globalData.rc.prevent_arming = globalData.global.prevent_ariming;
+          globalData.rc.new_channels[ARMING] = !globalData.rc.prevent_arming;
+        }
+        logger->info(globalData, "MIXER","S2");
         xSemaphoreGive(xTDataAllMutex);
     }    
 

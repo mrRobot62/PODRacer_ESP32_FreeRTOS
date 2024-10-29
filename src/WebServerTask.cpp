@@ -208,7 +208,7 @@ void webServerTask(void *parameter) {
     // FreeRTOS Task läuft permanent, ohne Aktion
     while (true) {
         // Daten aus der Queue holen und senden
-        Serial.printf("Aktuelle dataAll-Size: %d | ", sizeof(dataAll));
+        Serial.printf("Aktuelle dataAll-Size: %d | \n", sizeof(dataAll));
         if (xQueueReceive(queueWebServer, &dataAll, portMAX_DELAY) == pdTRUE) {
             sendData(&dataAll, sizeof(dataAll));
         }

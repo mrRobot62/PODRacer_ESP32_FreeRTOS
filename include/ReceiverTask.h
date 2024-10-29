@@ -2,6 +2,7 @@
 #define RECEIVER_TASK_H
 
 #include "data_struct.h"
+#include "globals.h"
 #include "Logger.h"
 
 void receiverTask(void *parameter);
