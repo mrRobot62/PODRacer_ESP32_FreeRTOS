@@ -41,15 +41,25 @@ void receiverTask(void *parameter) {
   while (1) {
     rcData = new TDataRC();
     hoverData = new TDataHover();
+
+    //-----------------------------------------------------------------------------------------
+    // --- READ - SBUS Daten 
+    //-----------------------------------------------------------------------------------------
     // immer den Receiver auslesen
     //Serial.printf("RECEIVER rcData: %d, %d, %d", rcData->gimbal_max, rcData->gimbal_mid, rcData->gimbal_min);
     receiver->read(rcData);
+
+    // -- arming/preventarming analysieren
+    if (rcData->raw_channels[ARMING]) bitSet(rcData->recvStatus, BIT0);
+//    if (compare2Bits(rcData->recvStatus, BIT0, BIT2))
     // raw_channel daten in Hover-Struktur kopieren
     memcpy(hoverData->raw_channels, rcData->raw_channels, sizeof(hoverData->raw_channels));
     //
     // wenn Mutex verfügbar, dann in Queue schreiben
     if (xSemaphoreTake(xReceiverMutex, (TickType_t)10) == pdTRUE) {
-      // Daten in Queue senden
+      //--------------------------------------------------------------
+      // aktuelle Daten in Queues senden
+      //--------------------------------------------------------------
       xQueueSend(queueReceiver, rcData, portMAX_DELAY);
       xQueueSend(queueHover, hoverData, portMAX_DELAY);
       
@@ -59,6 +69,10 @@ void receiverTask(void *parameter) {
         logger->info(*rcData, "RECV", "READ");
       }
     }    
+
+    //-----------------------------------------------------------------------------------------
+    // --- WRITE - SBUS Daten 
+    //-----------------------------------------------------------------------------------------
     // reset rcData
     memset(rcData, 0, sizeof(&rcData));
     // ab hier beginnt der WRITE-Teil des ReceiverTasks

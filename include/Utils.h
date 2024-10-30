@@ -4,6 +4,8 @@
 #include <Arduino.h>
 #include "data_struct.h"
 
+
+
 /**
  * @brief Prüft ob der Wert in current im Bereich des Targets liegt (in einer Range von Target-range / Target+range)
  */

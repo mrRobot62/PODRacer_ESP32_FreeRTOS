@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include "Utils.h"
 #include "MixerTask.h"
 #include "freertos/queue.h"
 
@@ -83,16 +84,16 @@ void mixerTask(void *parameter) {
         //
         // wenn einer der Task ein prevent_arming gesetzt hat, kann
         // das nicht überschrieben werden
-        globalData.global.prevent_ariming =
-          hoverData.prevent_arming |
-          surfaceData.prevent_arming |
-          oFlowData.prevent_arming |
-          steeringData.prevent_arming;
+        // globalData.global.prevent_ariming =
+        //   hoverData.prevent_arming |
+        //   surfaceData.prevent_arming |
+        //   oFlowData.prevent_arming |
+        //   steeringData.prevent_arming;
 
-        if (globalData.global.prevent_ariming) {
-          globalData.rc.prevent_arming = globalData.global.prevent_ariming;
-          globalData.rc.new_channels[ARMING] = !globalData.rc.prevent_arming;
-        }
+        // if (globalData.global) {
+        //   globalData.rc.prevent_arming = globalData.global.prevent_ariming;
+        //   globalData.rc.new_channels[ARMING] = !globalData.rc.prevent_arming;
+        // }
         logger->info(globalData, "MIXER","S2");
         xSemaphoreGive(xTDataAllMutex);
     }    

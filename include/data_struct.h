@@ -14,6 +14,8 @@
 
 #define LOOP_TIME 100
 
+
+
 enum {OFF, ON};
 
 //---------------------------------------------------------------
@@ -50,15 +52,15 @@ typedef struct {
 } TGlobalDefaultValues;
 
 typedef struct __attribute__((packed)) {
-  // status pattern
+  // status pattern (siehe readme_task.md)
   // 0b0000 0000
   //           |____ 0=starting mode, 1=ready
   //          |_____ 0=disarmed, 1=armed
+  //         |______ 1=prevent arming, 0=arming possible
+  //        |_______ 1=status changed, 0=no change
   //
-  // bit 2-7 unused
 
   uint8_t status_pattern = 0b0000000;  
- 
   // error_pattern
   // 0b0000 0000
   //           |____ Error in receiver task     (bit 0)
@@ -71,14 +73,6 @@ typedef struct __attribute__((packed)) {
   // Bit 4-7 are used as indivudual task error indicator
 
   uint8_t error_pattern = 0b00000000;
-
-  /**
-   * @brief set status mask. This neu state replace current state
-   * @param bit pattern
-   */
-  void setStatus(uint8_t mask) {
-    status_pattern = mask;
-  }
 
   /**
    * @brief set error mask. This mask will be "added" to current error stat (OR)
@@ -101,8 +95,9 @@ typedef struct __attribute__ ((packed)) {
   uint16_t gimbal_mid = 1500;             // center postion
   bool fail_safe = false;
   bool lost_frame = false;
-  bool is_armed = false; 
-  bool prevent_arming = true;             // default true, arming not possible
+  // bool is_armed = false; 
+  // bool prevent_arming = true;             // default true, arming not possible
+  uint8_t recvStatus = 0b00000000;       //
 } TDataRC;
 
 typedef struct __attribute__ ((packed)) {
@@ -170,7 +165,7 @@ typedef struct __attribute__ ((packed)) {
 typedef struct __attribute__ ((packed)) {
   long start_millis;            // Starting
   long end_millis;              // End (only used to measure timings)
-  bool prevent_ariming = true;
+  //bool prevent_ariming = true;
   char fwversion[10];
 } TDataGlobal;
 
@@ -209,106 +204,6 @@ typedef struct __attribute__ ((packed)) {
   TDataSteering steering;
   uint16_t end = 0xEEFF;
 } TDataAll;
-
-
-
-//--------------------------------------------------------------------------
-// nachfolgende Structs werden lediglich für die Kommunikation 
-// innerhalb der Tasks genutzt umd Daten auszutauschen
-//--------------------------------------------------------------------------
-
-// enum QueueDataTypes {
-//   QTYPE_RC,
-//   QTYPE_OFLOW,
-//   QTYPE_SURFACE,
-//   QTYPE_STEER,
-//   QTYPE_HOVER,
-//   QTYPE_MIXER
-// };
-
-// /**
-//  * @brief Diese QueueDatenstruktur beinhaltet Ergebnisse des OpticalFlow Tasks
-//  * @param channels: beinhaltet berechnete relative neue Werte für RPY, Throttle, Thrust
-//  * @param prevent_arming: wird auf True gesetzt, wenn etwas gegen ein arming festgestellt wurde
-//  * @param x,y: Vom Sensor ermittelte Werte für X und Y
-//  */
-// typedef struct {
-//   uint16_t channels[MIN_NUMBER_OF_CHANNELS] = {0};
-//   bool prevent_ariming = false;
-//   float x,y;
-// } TQueueDataOFLOW;
-
-// /**
-//  * @brief Diese QueueDatenstruktur beinhaltet Ergebnisse des SurfaceTasks
-//  * @param channels: beinhaltet berechnete relative neue Werte für RPY, Throttle, Thrust
-//  * @param prevent_arming: wird auf True gesetzt, wenn etwas gegen ein arming festgestellt wurde
-//  * @param distance_front: Abstand in mm des Front-Sensors
-//  * @param distance_rear: Abstand in mm des Rear-Sensors
-//  * 
-//  */
-// typedef struct {
-//   uint16_t channels[MIN_NUMBER_OF_CHANNELS] = {0};
-//   bool prevent_ariming = false;
-//   uint16_t distance_front;
-//   uint16_t distance_rear;
-
-// } TQueueDataSurface;
-
-// /**
-//  * @brief Diese QueueDatenstruktur beinhaltet Ergebnisse des HoverTasks
-//  * @param channels: beinhaltet berechnete relative neue Werte für RPY, Throttle, Thrust
-//  * @param prevent_arming: wird auf True gesetzt, wenn etwas gegen ein arming festgestellt wurde 
-//  * 
-//  */
-// typedef struct {
-//   uint16_t channels[MIN_NUMBER_OF_CHANNELS] = {0};
-//   bool prevent_ariming = false;
-
-// } TQueueDataHover;
-
-// /**
-//  * @brief Diese QueueDatenstruktur beinhaltet Ergebnisse des SteeringTasks
-//  * @param channels: beinhaltet berechnete relative neue Werte für RPY, Throttle, Thrust
-//  * @param prevent_arming: wird auf True gesetzt, wenn etwas gegen ein arming festgestellt wurde 
-//  * 
-//  */
-// typedef struct {
-//   uint16_t channels[MIN_NUMBER_OF_CHANNELS] = {0};
-//   bool prevent_ariming = false;
-
-// } TQueueDataSteer;
-
-// /**
-//  * @brief Diese QueueDatenstruktur beinhaltet Ergebnisse des HoverTasks
-//  * @param channels: beinhaltet berechnete relative neue Werte für RPY, Throttle, Thrust
-//  * @param is_armed: wird auf False gesetzt,wenn seitens eines anderen Tasks prevent_arming auf true gesetzt wurde
-//  * 
-//  */
-// typedef struct {
-//   uint16_t channels[NUMBER_OF_CHANNELS] = {0};
-//   bool is_armed = false;
-
-// } TQueueDataMixer;
-
-// /**
-//  * @brief Eine Zusammestellung der einzelnen Strukturnen. Wird nur für das Queue-Handling verwendet. Jeder Task setzt seinen
-//  * QueueDataType und fügt seine Struktur hinzu.
-//  */
-// typedef struct {
-//   QueueDataTypes type;
-
-//   // nachfolgender Union. Es kann nur eine Datenstruktur übergeben
-//   // werden
-//   union {
-//     TDataRC rcData;
-//     TQueueDataMixer mixerData;
-//     TQueueDataOFLOW oflowData;
-//     TQueueDataSteer steerData;
-//     TQueueDataSurface surfaceData;
-//     TQueueDataHover hoverData;
-//   } data;
-
-// } TQueueDataMessage;
 
 //--------------------------------------------------------------------------
 //--------------------------------------------------------------------------

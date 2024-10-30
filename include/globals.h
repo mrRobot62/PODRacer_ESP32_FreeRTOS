@@ -28,4 +28,14 @@ extern uint8_t MOCK_DATA_MASK_TFMini;
 extern uint8_t MOCK_DATA_MASK_VL53X1;
 
 
+/**
+ * @brief compare2Bits vergleicht zwei Bits, wenn beide gleich return true, sonst false
+ * @param mask : Bit-Maske
+ * @param bitA : Bitposition für Bit 1
+ * @param bitB : Bitposition für Bit 2
+ */
+#define compare2Bits(mask, bitA, bitB) ( \
+    ((mask & (1 << bitA)) != 0) == ((mask & (1 << bitB)) != 0) \
+)
+
 #endif

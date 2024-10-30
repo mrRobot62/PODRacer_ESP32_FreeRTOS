@@ -9,6 +9,7 @@
 #include "data_struct.h"
 #include "globals.h"
 #include "Logger.h"
+#include "MonitoringTask.h"
 
 // ************************************************************************************************************
 //  Espressif / Python stuff
@@ -123,6 +124,16 @@ void setup() {
 
   // Starte BlinkTask mit niedriger Prio
   xTaskCreatePinnedToCore(blinkTask, "BlinkTask", 2024, NULL, 1, NULL, 1);
+
+  // Erstelle den MonitoringTask mit einer moderaten Priorität
+  xTaskCreate(
+      monitoringTask,      // Task-Funktion
+      "MonitoringTask",    // Name des Tasks
+      4096,                // Stackgröße
+      nullptr,             // Parameter für den Task (none)
+      1,                   // Task-Priorität
+      nullptr              // Task-Handle (optional)
+  );
 }
 
 void loop() {
