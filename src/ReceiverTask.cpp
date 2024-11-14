@@ -9,6 +9,16 @@
 SemaphoreHandle_t xMutex;
 TDataRC queueRCData;
 
+void updateMaskBlinkPattern(uint8_t newMask)
+{
+  // Zugriff auf die Bitmaske mit Mutex schützen
+  if (xSemaphoreTake(xbitmaskBlinkMutex, portMAX_DELAY) == pdTRUE)
+  {
+    blink_mask = newMask;
+    xSemaphoreGive(xbitmaskBlinkMutex);
+  }
+}
+
 void receiverTask(void *parameter)
 {
   char buffer[50];
@@ -101,7 +111,7 @@ void receiverTask(void *parameter)
              CHECK_BIT_PATTERN(lokalRCData->armingMask, 0b00000100) &&
              CHECK_BIT_ZERO(lokalRCData->armingMask, BIT0))
     {
-      // Alle Preventig-Situationen sind überprüft worden. 
+      // Alle Preventig-Situationen sind überprüft worden.
       // Arming ist jetzt möglich
       lokalRCData->is_armed = true;
       SET_BIT(lokalRCData->armingMask, BIT1);
@@ -115,11 +125,6 @@ void receiverTask(void *parameter)
       CLEAR_BIT(lokalRCData->armingMask, BIT1);
     }
 
-    if (CHECK_BIT(LOG_MASK_RECEIVER, LOGGING_BIT) && CHECK_BIT(LOG_MASK_RECEIVER, LOGGING_RECV_READ))
-    {
-      logger->info(*lokalRCData, millis(), "RECV", "READ");
-    }
-
     // der HoverTask benötigt die aktuellen RawChannel Daten für seine Verarbeitung
     // raw_channel daten in Hover-Struktur kopieren
     memcpy(lokalHoverData->raw_channels, lokalRCData->raw_channels, sizeof(lokalHoverData->raw_channels));
@@ -128,23 +133,41 @@ void receiverTask(void *parameter)
     //--------------------------------------------------------------
     //
     // wenn Mutex verfügbar, dann in Queue schreiben
-    // if (xSemaphoreTake(xReceiverMutex, MUTEX_WAIT_TIMEOUT) == pdTRUE)
-    // {
-    //   // Mutex freigeben
-    //   xSemaphoreGive(xReceiverMutex);
+    if (xSemaphoreTake(xReceiverMutex, MUTEX_WAIT_TIMEOUT) == pdTRUE)
+    {
+      // Mutex freigeben
+      xSemaphoreGive(xReceiverMutex);
 
-    //   xQueueSend(queueReceiver, lokalRCData, portMAX_DELAY);
-    //   xQueueSend(queueHoverRcv, lokalHoverData, portMAX_DELAY);
+      xQueueSend(queueReceiver, lokalRCData, portMAX_DELAY);
+      // xQueueSend(queueHoverRcv, lokalHoverData, portMAX_DELAY);
 
-    //   if (CHECK_BIT(LOG_MASK_RECEIVER, LOGGING_BIT) && CHECK_BIT(LOG_MASK_RECEIVER, LOGGING_RECV_READ))
-    //   {
-    //     logger->info(*lokalRCData, millis(), "RECV", "READ");
-    //   }
-    // }
-    // else
-    // {
-    //   logger->warn(*lokalRCData, millis(), "RECVR", "MUTEX");
-    // }
+      if (CHECK_BIT(LOG_MASK_RECEIVER, LOGGING_BIT) && CHECK_BIT(LOG_MASK_RECEIVER, LOGGING_RECV_READ))
+      {
+        logger->info(*lokalRCData, millis(), "RECV", "READ");
+      }
+
+      //--------------------------------------------------------------
+      // Blink-Pattern
+      //--------------------------------------------------------------
+      if (lokalRCData->is_armed)
+        updateMaskBlinkPattern(0b00010001); // LED_STATE, 100ms
+      else
+      {
+        if (CHECK_BIT(lokalRCData->armingMask, BIT0))
+        {
+          // disarmed, nicht in Grundeinstellung
+          updateMaskBlinkPattern(0b00111010); // LED1 1000ms, LED2 200ms
+        }
+        else
+        {
+          updateMaskBlinkPattern(0b00011000); // LED_STATE, LED_ERR1 => 1000ms
+        }
+      }
+    }
+    else
+    {
+      logger->warn(*lokalRCData, millis(), "RECVR", "MUTEX");
+    }
 
     armingMask = lokalRCData->armingMask & 0b00000111;
 

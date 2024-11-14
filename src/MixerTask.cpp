@@ -112,29 +112,6 @@ void mixerTask(void *parameter)
 
     if (xSemaphoreTake(xTDataAllMutex, (TickType_t)10) == pdTRUE)
     {
-      //
-      // WENN ChangeBit und PreventBit gesetzt sind, bedeutet das ,das
-      // (a) der Receiver den Status verändert hat
-      // (b) ein Task das PreventBit gesetzt hat
-      // DANN damit löschen das ArmingBit und setzen explizit das ChangeBit
-      // ELSE PreventBit löschen, ChangeBit löschen. Der HoverTask setzt das PreventBit grundsätzlich, wenn RPY <> mid und THR/TRU <> min sind
-      //      nur im Zusammenhang mit dem changeBit wird ein tatsächliches preventArming ausgelöst
-      if (CHECK_BIT(lokalDataAll.status.status_pattern, PREVENT_BIT) && CHECK_BIT(lokalDataAll.status.status_pattern, CHANGE_BIT))
-      {
-        // Serial.println("--- STATUS a (Problem) ---");
-        CLEAR_BIT(lokalDataAll.status.status_pattern, ARMING_BIT);
-        SET_BIT(lokalDataAll.status.status_pattern, PREVENT_BIT);
-        SET_BIT(lokalDataAll.status.status_pattern, CHANGE_BIT);
-        SET_BIT(lokalDataAll.status.error_pattern, BIT7); // Error PreventArming
-      }
-      else
-      {
-        // Serial.println("--- STATUS b (OK) ---");
-        SET_BIT(lokalDataAll.status.status_pattern, ARMING_BIT);
-        CLEAR_BIT(lokalDataAll.status.status_pattern, PREVENT_BIT);
-        CLEAR_BIT(lokalDataAll.status.error_pattern, BIT7);
-        CLEAR_BIT(lokalDataAll.status.status_pattern, CHANGE_BIT);
-      }
 
       globalData.status = lokalDataAll.status;
       globalData.hover = lokalDataAll.hover;

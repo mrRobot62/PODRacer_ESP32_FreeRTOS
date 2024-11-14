@@ -30,9 +30,13 @@
 #define LOGGING_SURF_RAW BIT6
 #define LOGGING_SURF_CALC BIT5
 
-#define ARMING_BIT BIT0
-#define PREVENT_BIT BIT1
-#define CHANGE_BIT BIT2
+#define PREVENT_BIT BIT0
+#define ARMING_BIT BIT1
+#define ARM_SW_BIT BIT2
+
+#define LED_STATE 12 // blau (RUNNING, Armed, Disarmed)
+#define LED_ERR1 14  // rot (Fehler)
+#define LED_ERR2 27  // rot (Fehler)
 
 extern uint8_t LOG_MASK_RECEIVER;
 extern uint8_t LOG_MASK_MIXER;   //
@@ -44,6 +48,8 @@ extern uint8_t MOCK_DATA_MASK_SBUS;
 extern uint8_t MOCK_DATA_MASK_PMW3901;
 extern uint8_t MOCK_DATA_MASK_TFMini;
 extern uint8_t MOCK_DATA_MASK_VL53X1;
+
+extern uint8_t blink_mask;
 
 #define SBUS_RX_PIN 16
 #define SBUS_TX_PIN 17

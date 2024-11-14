@@ -299,6 +299,7 @@ extern QueueHandle_t queueSteering;
 
 extern TDataAll globalData;
 extern SemaphoreHandle_t xTDataAllMutex;
+extern SemaphoreHandle_t xbitmaskBlinkMutex;
 extern EventGroupHandle_t xEventGroup;
 
 #endif

@@ -60,6 +60,8 @@ QueueHandle_t queueSteering;
 
 TDataAll globalData;
 SemaphoreHandle_t xTDataAllMutex;
+SemaphoreHandle_t xbitmaskBlinkMutex; // Mutex zum Schutz der Bitmaske für den BlinkTask
+
 EventGroupHandle_t xEventGroup;
 
 //
@@ -91,6 +93,7 @@ uint8_t MOCK_DATA_MASK_MIXER = 0b00000001;
 uint8_t ch_map[NUM_CHANNELS] = {0, 1, 7, 3, 4, 2, 5, 6};
 
 TSBUSGlobalDefaultValues gSBUSDefaultValues;
+uint8_t blink_mask;
 
 char __buf__[50];
 
@@ -118,6 +121,15 @@ void setup()
   queueHoverSend = xQueueCreate(QUEUE_SIZE, sizeof(TDataHover));
   queueSteering = xQueueCreate(QUEUE_SIZE, sizeof(TDataSteering));
 
+  // Mutex erstellen
+  xbitmaskBlinkMutex = xSemaphoreCreateMutex();
+  if (xbitmaskBlinkMutex == NULL)
+  {
+    logger->message("BlinkMutex nicht verfügbar", 1, millis(), "main", "Z125");
+    while (1)
+      ;
+  }
+
   // EventGroup initialisieren
   xEventGroup = xEventGroupCreate();
   if (xEventGroup == NULL)
@@ -140,7 +152,14 @@ void setup()
   // xTaskCreatePinnedToCore(webServerTask, "WebServerTask", 8192, NULL, 1, NULL, 0);
 
   // Starte BlinkTask mit niedriger Prio
-  // xTaskCreatePinnedToCore(blinkTask, "BlinkTask", 2024, NULL, 1, NULL, 1);
+  // Parameter 1 : PIN, Parameter 2:
+  static uint32_t led1Params[] = {LED_STATE, 0x01, 0b00010000};
+  static uint32_t led2Params[] = {LED_ERR1, 0x02, 0b000100000};
+  static uint32_t led3Params[] = {LED_ERR2, 0x04, 0b001000000};
+
+  xTaskCreatePinnedToCore(blinkTask, "LED1Task", 2560, led1Params, 1, NULL, 1);
+  xTaskCreatePinnedToCore(blinkTask, "LED2Task", 2560, led2Params, 1, NULL, 1);
+  xTaskCreatePinnedToCore(blinkTask, "LED3Task", 2560, led3Params, 1, NULL, 1);
 
   // Erstelle den MonitoringTask mit einer moderaten Priorität
   // xTaskCreate(

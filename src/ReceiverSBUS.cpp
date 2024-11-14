@@ -31,12 +31,14 @@ void ReceiverSBUS::read(TDataRC *data)
         data->fail_safe = sbus_raw_data.failsafe;
         data->lost_frame = sbus_raw_data.lost_frame;
         memcpy(data->raw_channels, sbus_raw_data.ch, sizeof(sbus_raw_data.ch));
+        //logger->info(*data, millis(), "SBUS", "RAW");
 
         for (uint8_t ch = 0; ch < MIN_NUMBER_OF_CHANNELS; ch++)
         {
             // ermittlung des MIN/MAX Raw-Wertes
             sbus_calibration_data[ch][CALIB_RAW_MIN] = (data->raw_channels[ch] < sbus_calibration_data[ch][CALIB_RAW_MIN] || sbus_calibration_data[ch][CALIB_RAW_MIN] == 0 ? data->raw_channels[ch] : sbus_calibration_data[ch][CALIB_RAW_MIN]);
             sbus_calibration_data[ch][CALIB_RAW_MAX] = (data->raw_channels[ch] > sbus_calibration_data[ch][CALIB_RAW_MAX] || sbus_calibration_data[ch][CALIB_RAW_MAX] == 0 ? data->raw_channels[ch] : sbus_calibration_data[ch][CALIB_RAW_MAX]);
+            //sbus_calibration_data[ch][CALIB_RAW_MID] = sbus_calibration_data[ch][CALIB_RAW_MIN] + (sbus_calibration_data[ch][CALIB_RAW_MAX] - sbus_calibration_data[ch][CALIB_RAW_MIN]) >> 1;
             // Mapping auf einen normierten Wertebereich zwischen 1000 und 2000
             data->raw_channels[ch] = map(
                 sbus_raw_data.ch[ch],
@@ -45,13 +47,15 @@ void ReceiverSBUS::read(TDataRC *data)
                 sbus_calibration_data[ch][CALIB_GIMB_MIN],
                 sbus_calibration_data[ch][CALIB_GIMB_MAX]);
         }
-        // Serial.printf("ARMING: %d\n", data->raw_channels[ch_map[ARM]]);
         //
         //  relevante SBUS-Flags setzen
-        //logger->printBinary8("SBUS","preRst ", data->armingMask);
+        // logger->printBinary8("SBUS","preRst ", data->armingMask);
         resetSBUSFlags(&data->armingMask, data);
-        //logger->printBinary8("SBUS","postRst", data->armingMask);
+        // logger->printBinary8("SBUS","postRst", data->armingMask);
 
+        /***************************************************************************/
+        /* Ob tatsächlich ein Armen möglich ist, wird im ReceiverTask festgestellt */
+        /***************************************************************************/
     }
     else
     {
@@ -59,18 +63,6 @@ void ReceiverSBUS::read(TDataRC *data)
         Serial.println("no sbus->read() data available...");
         Serial.println("!!!!! ---------------------------------------------------- !!!!!");
     }
-    // if (sbus_rx->read()) {
-    //     // Kanäle und Statusinformationen aus der SBUS-Library auslesen
-    //     for (int i = 0; i < 16; i++) {
-    //         data->channels[i] = sbus.channels[i];
-    //     }
-    //     data->failsafe = sbus.failsafe();
-    //     data->frameLost = sbus.lostFrame();
-
-    //     rcData = *data;  // Lokale Kopie der Daten
-    //     return true;     // Erfolgreiches Auslesen
-    // }
-    // return false;        // Kein neues Frame verfügbar
 }
 
 // Methode zum Senden der SBUS-Daten
