@@ -9,17 +9,16 @@
 #include "Utils.h"
 #include <data_struct.h>
 
+class HoverController : public IController<TDataHover>
+{
+public:
+    HoverController();
 
-class HoverController : public IController<TDataHover>{
-    public:
-        HoverController();
+    void read(TDataHover &data) override;
 
-        void read(TDataHover &data) override;
-
-    private:
-        ISensor<TSensorPMW3901> *pmw3901 ;
-        TGlobalDefaultValues globalValues;
-
+private:
+    ISensor<TSensorPMW3901> *pmw3901;
+    TSBUSGlobalDefaultValues globalValues;
 };
 
 #endif

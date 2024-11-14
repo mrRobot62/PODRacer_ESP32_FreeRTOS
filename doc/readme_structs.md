@@ -75,3 +75,58 @@ typedef struct __attribute__ ((packed)) {
         </tr>
     </tbody>
 </table>
+
+
+<table>
+    <caption>Error-Pattern</caption>
+    <thead>
+        <tr>
+            <th style="border: 1px solid black;">BIT</th>
+            <th style="border: 1px solid black;">Value</th>
+            <th style="border: 1px solid black;">Info</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td style="border: 1px solid black;">0</td>
+            <td style="border: 1px solid black;">1= Error in ReceiverTask</td>
+            <td style="border: 1px solid black;"></td>
+        </tr>
+        <tr>
+            <td style="border: 1px solid black;">1</td>
+            <td style="border: 1px solid black;">1= Error in MixerTask</td>
+            <td style="border: 1px solid black;"></td>
+        </tr>
+        <tr>
+            <td style="border: 1px solid black;">2</td>
+            <td style="border: 1px solid black;">1= Error in HoverTask</td>
+            <td style="border: 1px solid black;"></td>
+        </tr>
+        <tr>
+            <td style="border: 1px solid black;">3</td>
+            <td style="border: 1px solid black;">1= Error in SurfaceTask</td>
+            <td style="border: 1px solid black;"></td>
+        </tr>
+        <tr>
+            <td style="border: 1px solid black;">4</td>
+            <td style="border: 1px solid black;">free</td>
+            <td style="border: 1px solid black;"></td>
+        </tr>
+        <tr>
+            <td style="border: 1px solid black;">5</td>
+            <td style="border: 1px solid black;">free</td>
+            <td style="border: 1px solid black;"></td>
+        </tr>
+        <tr>
+            <td style="border: 1px solid black;">6</td>
+            <td style="border: 1px solid black;">free</td>
+            <td style="border: 1px solid black;"></td>
+        </tr>
+        <tr>
+            <td style="border: 1px solid black;">7</td>
+            <td style="border: 1px solid black;">1=PreventArming</td>
+            <td style="border: 1px solid black;"></td>
+        </tr>
+    </tbody>
+</table>
+

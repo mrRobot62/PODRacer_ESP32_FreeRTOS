@@ -2,6 +2,8 @@
 #define MONITORING_TASK_H
 
 #include <Arduino.h>
+#include "data_struct.h"
+#include "Logger.h"
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 

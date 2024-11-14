@@ -1,5 +1,5 @@
 {
-    "folders": [
+	"folders": [
 		{
 			"name": "PODRacer_ESP32_RTOS",
 			"path": "."
@@ -11,7 +11,8 @@
 			"*.h_": "cpp",
 			"array": "cpp",
 			"string": "cpp",
-			"string_view": "cpp"
+			"string_view": "cpp",
+			"*.tcc": "cpp"
 		}
 	}
 }

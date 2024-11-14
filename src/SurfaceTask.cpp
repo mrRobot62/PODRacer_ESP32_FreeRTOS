@@ -1,5 +1,8 @@
 #include <Arduino.h>
+#include <HardwareSerial.h>
 #include "SurfaceTask.h"
+#include "data_struct.h"
+#include "Utils.h"
 #include <PID_v1.h>
 #include <TFMini.h>
 #include "freertos/queue.h"
@@ -28,7 +31,7 @@ void surfaceTask(void *parameter) {
         Serial.println("Queue send error");
       }
     }
-    Serial.println("Surface running");
-    vTaskDelay(3750 / portTICK_PERIOD_MS);
+    //Serial.println("Surface running");
+    vTaskDelay(pdMS_TO_TICKS(LOOP_TIME));
   }
 }

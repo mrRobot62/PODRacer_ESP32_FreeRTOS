@@ -101,28 +101,28 @@ Bit 0 - ist in der Regel immer eine Default Einstellung. <b>Fett dargestellte We
     <tbody>
         <tr>
             <td style="border: 1px solid black;">0</td>
-            <td style="border: 1px solid black;">ROLL,PITCH,YAW=mid, <br>Throttle,Thrust=min, ARMING=false</td>
+            <td style="border: 1px solid black;">ROLL,PITCH,YAW=mid, <br>Throttle,Thrust=min, ARMING=false<br>OK: Disarmed</td>
             <td style="border: 1px solid black;"></td>
             <td style="border: 1px solid black;"></td>
             <td style="border: 1px solid black;"></td>
         </tr>
         <tr>
             <td style="border: 1px solid black;">1</td>
-            <td style="border: 1px solid black;">ROLL,PITCH,YAW=mid, <br>Throttle,Thrust=min, <b>ARMING=true</b></td>
+            <td style="border: 1px solid black;">ROLL,PITCH,YAW=mid, <br>Throttle,Thrust=min, <b>ARMING=true</b><br>OK: ARMED</td>
             <td style="border: 1px solid black;"></td>
             <td style="border: 1px solid black;"></td>
             <td style="border: 1px solid black;"></td>
         </tr>
         <tr>
             <td style="border: 1px solid black;">2</td>
-            <td style="border: 1px solid black;"><b>ROLL=min</b>,PITCH,YAW=mid, <br>Throttle,Thrust=min, <b>ARMING=true</b></td>
+            <td style="border: 1px solid black;"><b>ROLL=min</b>,PITCH,YAW=mid, <br>Throttle,Thrust=min, <b>ARMING=true</b><br>ERR:R<>mid</td>
             <td style="border: 1px solid black;"></td>
             <td style="border: 1px solid black;"></td>
             <td style="border: 1px solid black;"></td>
         </tr>
         <tr>
             <td style="border: 1px solid black;">3</td>
-            <td style="border: 1px solid black;">ROLL,PITCH,YAW=mid, <br><b>Throttle,Thrust=mid</b>, <b>ARMING=true</b></td>
+            <td style="border: 1px solid black;">ROLL,PITCH,YAW=mid, <br><b>Throttle,Thrust=mid</b>, <b>ARMING=true</b> <br>ERR:THR/TRU<>min</td>
             <td style="border: 1px solid black;"></td>
             <td style="border: 1px solid black;"></td>
             <td style="border: 1px solid black;"></td>
