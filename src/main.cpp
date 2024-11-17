@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include "ConfigManager.h"
 #include "ReceiverTask.h"
+#include "HoverTask.h"
 #include "SurfaceTask.h"
 #include "MixerTask.h"
 #include "BlinkTask.h"
@@ -10,6 +11,7 @@
 #include "globals.h"
 #include "Logger.h"
 #include "MonitoringTask.h"
+
 #include "Utils.h"
 
 // ************************************************************************************************************
@@ -67,11 +69,13 @@ EventGroupHandle_t xEventGroup;
 //
 // Logging-Pattern, detaillierte Beschreibung siehe readme_logging.md.
 // Bit 7 ist generell für loggen ON(1)/OFF(0), Bit 6-0 sind indivduell
-uint8_t LOG_MASK_RECEIVER = 0b11000000; // B6 = READ, B5=WRITE, B0=MISC
-uint8_t LOG_MASK_MIXER = 0b01111001;    //
+uint8_t LOG_MASK_RECEIVER = 0b00100000; // B6 = READ, B5=WRITE, B0=MISC
+uint8_t LOG_MASK_MIXER = 0b01000010;    //
 uint8_t LOG_MASK_SURFACE = 0b01100000;  //
 uint8_t LOG_MASK_HOVER = 0b01100000;    //
-uint8_t LOG_MASK_STATUS = 0b11000000;
+uint8_t LOG_MASK_STATUS = 0b01000000;
+
+uint8_t LOG_MASK_COMPFLIT = 0b1000000;
 
 // uint8_t MOCK_DATA_MASK_SBUS     =0b00000001;    // Verhalten 0, mehr Details siehe readme_mock.md
 // uint8_t MOCK_DATA_MASK_SBUS     = 0b00000010;   // Verhalten 1, mehr Details siehe readme_mock.md
@@ -93,12 +97,15 @@ uint8_t MOCK_DATA_MASK_MIXER = 0b00000001;
 uint8_t ch_map[NUM_CHANNELS] = {0, 1, 7, 3, 4, 2, 5, 6};
 
 TSBUSGlobalDefaultValues gSBUSDefaultValues;
-uint8_t blink_mask;
+uint8_t blink_mask[3];
+
+bool generalFreeRTOSError;
 
 char __buf__[50];
 
 void setup()
 {
+  generalFreeRTOSError = false;
   Serial.begin(115200);
   globalCFG.initFlash(false); // explizit KEIN komplettes Löschen des Flashes durchführen
 
@@ -112,6 +119,10 @@ void setup()
   uint8_t DEFAULT_CHANNEL_MAP[NUM_CHANNELS] = {0, 1, 7, 3, 4, 2, 5, 6};
   setChannelMapping(DEFAULT_CHANNEL_MAP);
   logger->info(ch_map);
+
+  // ------------------------------------------------------------------------------
+  // Sensoren initialisieren
+  // ------------------------------------------------------------------------------
 
   // Erstelle die Queues
   queueReceiver = xQueueCreate(QUEUE_SIZE, sizeof(TDataRC));
@@ -141,6 +152,9 @@ void setup()
   // ReceiverTask wird Core 0 zugewiesen (höchste Priorität)
   xTaskCreatePinnedToCore(receiverTask, "ReceiverTask", 4096, NULL, 2, NULL, 1);
 
+  // Hover wird Core 1 zugewiesen
+  xTaskCreatePinnedToCore(hoverTask, "HoverTask", 4096, NULL, 1, NULL, 1);
+
   // DistanceTask wird Core 1 zugewiesen
   // xTaskCreatePinnedToCore(surfaceTask, "SurfaceTask", 4096, NULL, 1, NULL, 1);
 
@@ -153,9 +167,9 @@ void setup()
 
   // Starte BlinkTask mit niedriger Prio
   // Parameter 1 : PIN, Parameter 2:
-  static uint32_t led1Params[] = {LED_STATE, 0x01, 0b00010000};
-  static uint32_t led2Params[] = {LED_ERR1, 0x02, 0b000100000};
-  static uint32_t led3Params[] = {LED_ERR2, 0x04, 0b001000000};
+  static uint32_t led1Params[] = {LED_STATE, 0x00, 0b00010000};
+  static uint32_t led2Params[] = {LED_ERR1, 0x01, 0b00100000};
+  static uint32_t led3Params[] = {LED_ERR2, 0x02, 0b01000000};
 
   xTaskCreatePinnedToCore(blinkTask, "LED1Task", 2560, led1Params, 1, NULL, 1);
   xTaskCreatePinnedToCore(blinkTask, "LED2Task", 2560, led2Params, 1, NULL, 1);

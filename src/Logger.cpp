@@ -116,6 +116,95 @@ void Logger::logSpecificData(const TDataRC tdata, uint8_t level, unsigned long m
     Serial.print(buffer);
 }
 
+void Logger::logSpecificData(const TDataComplementaryFilter tdata, uint8_t level, unsigned long ms, const char *domain, const char *subdomain, bool useUDP, bool cr)
+{
+    char lString[5 + 1];
+    char arm[3 + 1];
+    char prevent[3 + 1];
+    char crlf = ' ';
+    char binBuffer[10];
+    ;
+
+    this->getLogLevelString(lString, level);
+
+    crlf = ' ';
+    if (cr)
+        crlf = '\n';
+
+    if (subdomain == "ALL")
+    {
+        sprintf(buffer, "%8d|%5s|%5s|%5s|%3s|Raw:%4.0f %4.0f %4.0f %4.0f %4.0f %4.0f|PID1: %03.2f %03.2f %03.2f|PID2: %03.2f %03.2f %03.2f|PID3: %03.2f %03.2f %03.2f|PID4: %03.2f %03.2f %03.2f|%c",
+                ms, lString, domain, subdomain, arm,
+                tdata.rawHeightFront, tdata.rawHeightFront, tdata.rawHeight, tdata.rawYaw, tdata.rawDrift[0], tdata.rawDrift[1],
+                tdata.pidInput, tdata.pidOutput, tdata.pidSetpoint,
+                tdata.pidYawInput, tdata.pidYawOutput, tdata.pidYawSetpoint,
+                tdata.pidDriftXInput, tdata.pidDriftXOutput, tdata.pidDriftSetpoint,
+                tdata.pidDriftYInput, tdata.pidDriftYOutput, tdata.pidDriftSetpoint,
+                crlf);
+    }
+    else if (subdomain == "SDIST")
+    {
+        sprintf(buffer, "%8d|%5s|%5s|%5s|%3s|Raw:%4.0f %4.0f %4.0f %4.0f %4.0f %4.0f|PID: %03.2f %03.2f %03.2f|%c",
+                ms, lString, domain, subdomain, arm,
+                tdata.rawHeightFront, tdata.rawHeightFront, tdata.rawHeight, tdata.rawYaw, tdata.rawDrift[0], tdata.rawDrift[1],
+                tdata.pidInput, tdata.pidOutput, tdata.pidSetpoint,
+                // tdata.pidYawInput, tdata.pidYawOutput, tdata.pidYawSetpoint,
+                // tdata.pidDriftXInput, tdata.pidDriftXOutput, tdata.pidDriftSetpoint,
+                // tdata.pidDriftYInput, tdata.pidDriftYOutput, tdata.pidDriftSetpoint,
+                crlf);
+    }
+    else if (subdomain == "YAW")
+    {
+        sprintf(buffer, "%8d|%5s|%5s|%5s|%3s|Raw:%4.0f %4.0f %4.0f %4.0f %4.0f %4.0f|PID: %03.2f %03.2f %03.2f|%c",
+                ms, lString, domain, subdomain, arm,
+                tdata.rawHeightFront, tdata.rawHeightFront, tdata.rawHeight, tdata.rawYaw, tdata.rawDrift[0], tdata.rawDrift[1],
+                // tdata.pidInput, tdata.pidOutput, tdata.pidSetpoint,
+                tdata.pidYawInput, tdata.pidYawOutput, tdata.pidYawSetpoint,
+                // tdata.pidDriftXInput, tdata.pidDriftXOutput, tdata.pidDriftSetpoint,
+                // tdata.pidDriftYInput, tdata.pidDriftYOutput, tdata.pidDriftSetpoint,
+                crlf);
+    }
+    else if (subdomain == "DRIFT")
+    {
+        sprintf(buffer, "%8d|%5s|%5s|%5s|%3s|Raw:%4.0f %4.0f %4.0f %4.0f %4.0f %4.0f|PID_X: %03.2f %03.2f %03.2f|PID_Y: %03.2f %03.2f %03.2f|%c",
+                ms, lString, domain, subdomain, arm,
+                tdata.rawHeightFront, tdata.rawHeightFront, tdata.rawHeight, tdata.rawYaw, tdata.rawDrift[0], tdata.rawDrift[1],
+                // tdata.pidInput, tdata.pidOutput, tdata.pidSetpoint,
+                //  tdata.pidYawInput, tdata.pidYawOutput, tdata.pidYawSetpoint,
+                tdata.pidDriftXInput, tdata.pidDriftXOutput, tdata.pidDriftSetpoint,
+                tdata.pidDriftYInput, tdata.pidDriftYOutput, tdata.pidDriftSetpoint,
+                crlf);
+    }
+    else if (subdomain == "IMU")
+    {
+    }
+    Serial.print(buffer);
+}
+
+void Logger::logSpecificData(const TDataComplementaryFilterCfg tdata, uint8_t level, unsigned long ms, const char *domain, const char *subdomain, bool useUDP, bool cr)
+{
+    char lString[5 + 1];
+    char arm[3 + 1];
+    char prevent[3 + 1];
+    char crlf = ' ';
+    char binBuffer[10];
+    ;
+
+    this->getLogLevelString(lString, level);
+
+    crlf = ' ';
+    if (cr)
+        crlf = '\n';
+
+    sprintf(buffer, "%8d|%5s|%5s|%5s|%3s|tH:%04d|tD:%03d|tY:%03d|%c",
+            ms, lString, domain, subdomain, arm,
+            tdata.targetHeight, tdata.targetDrift, tdata.targetYaw,
+
+            crlf);
+
+    Serial.print(buffer);
+}
+
 void Logger::logSpecificData(const TDataHover tdata, uint8_t level, unsigned long ms, const char *domain, const char *subdomain, bool useUDP, bool cr)
 {
 }

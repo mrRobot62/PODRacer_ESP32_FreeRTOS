@@ -34,65 +34,7 @@ typedef struct __attribute__ ((packed)) {
 Die `TDataRC` wird in die Queue `queueReceiver` geschrieben
 
 ###  STATUS_MASK
-Bit-Pattern, wird benötigt um einen Statuswechsel von ARMED/DISARMED zu bewerten um ggf. ein
-Prevent-Arming zu definieren. ARMING darf nur dann möglich sein, wenn es gefahrlos ist.
-Faktoren für ein gefahrloses ARMEN sind (Value: 1500)
-- Roll/Pitch/Yaw stehen auf MID-Position (Value: 1500)
-- Throttle(Gimbal) / Thrust (poti) stehen auf MIN-Position (Value: 1000)
-
-
-<table>
-    <caption>Status Maskierung</caption>
-    <thead>
-        <tr>
-            <th style="border: 1px solid black;">BIT</th>
-            <th style="border: 1px solid black;">Value</th>
-            <th style="border: 1px solid black;">Info</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td style="border: 1px solid black;">0</td>
-            <td style="border: 1px solid black;">0=starting mode, 1=ready</td>
-            <td style="border: 1px solid black;">Für LED1-Signale</td>
-        </tr>
-        <tr>
-            <td style="border: 1px solid black;">1</td>
-            <td style="border: 1px solid black;">1=armed, 0=disarmed</td>
-            <td style="border: 1px solid black;">Gibt den aktuellen Status aus raw_channels[ARMING]</td>
-        </tr>
-        <tr>
-            <td style="border: 1px solid black;">2</td>
-            <td style="border: 1px solid black;">1=prevent arming, 0=arming possible</td>
-            <td style="border: 1px solid black;">errechneter Wert, wenn Arming nicht erlaubt wird</td>
-        </tr>
-        <tr>
-            <td style="border: 1px solid black;">3</td>
-            <td style="border: 1px solid black;">1=Status changed, 0=keine Änderung</td>
-            <td style="border: 1px solid black;">Bezieht sich auf Bit0</td>
-        </tr>
-        <tr>
-            <td style="border: 1px solid black;">4</td>
-            <td style="border: 1px solid black;"></td>
-            <td style="border: 1px solid black;"></td>
-        </tr>
-        <tr>
-            <td style="border: 1px solid black;">5</td>
-            <td style="border: 1px solid black;"></td>
-            <td style="border: 1px solid black;"></td>
-        </tr>
-        <tr>
-            <td style="border: 1px solid black;">6</td>
-            <td style="border: 1px solid black;"></td>
-            <td style="border: 1px solid black;"></td>
-        </tr>
-        <tr>
-            <td style="border: 1px solid black;">7</td>
-            <td style="border: 1px solid black;"></td>
-            <td style="border: 1px solid black;"></td>
-        </tr>
-    </tbody>
-</table>
+siehe `readme_arming_logic.md`
 
 
 ### Besondere Informationen zum Task
@@ -106,11 +48,10 @@ liest aus er `queueReceiver` eine Datenstruktur `TDataAll` und liest die new_cha
 
 ## HoverTask
 ### Beschreibung
-Der HoverTask ist dafür verantwortlich um den PODRacer in eine stabile Schwebeposition zu halten. Hierzu nutzt er den OpticalFlow Sensor PMW3901 und wertet seine Driftbewegung
+Der HoverTask ist dafür verantwortlich um den PODRacer in eine stabile Schwebeposition zu halten. Hierzu nutzt er den OpticalFlow Sensor PMW3901 und wertet seine Driftbewegung. (ggf. wird noch ein MPU6500 hinzugefügt
+)
 in X/Y Richtung aus und berechnet daraus eine relative Roll/Pitch bewegung.
 Der HoverTask rechnet nur dann, wenn Thrust (Impeller) auf 0 steht. Sobald der Pilot den Gimbal bewegt, ignoriert der Hover alle PMW3901 Ausgaben.
-
-
 
  ### genutzte Sensoren
 Genutzt wird der PMW3901 Sensor. Dieser Sensor liefert ein X/Y Signal zurück, das eine Driftbewegung definiert.

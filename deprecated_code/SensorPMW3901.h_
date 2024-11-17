@@ -1,0 +1,123 @@
+#ifndef _SENSORPMW3901_H_
+#define _SENSORPMW3901_H_
+
+#include <Arduino.h>
+#include <freertos/semphr.h>
+
+#include <Bitcraze_PMW3901.h>
+#include <PID_v1.h>
+#include "Logger.h"
+#include "ISensor.h"
+#include "globals.h"
+#include "data_struct.h"
+
+//------------------------------------------------------------------------------------------------------------
+//
+// OpticalFlow
+//------------------------------------------------------------------------------------------------------------
+// #define OFLOW_COUNTER_MAX 100         // currently not used :-/
+#define OFLOW_SLIP_RANGE 500       // during measurement we add the result from sensor, if sum is larger than range, we assume PODRacer slips
+#define OFLOW_PMW3901_ZERO 1       // due to sensor fluctuation a little bit, this value is used as "minus/plus range" to avoid jitter
+#define OFLOW_PID_OUTPUT_LIMIT 250 // to avoid to big output from PIDController, we limit the output value
+
+/**
+    Verwenden eines PMW3901 Optical-Flow-Sensors
+
+    Dieser Sensor wird verwendet, um zu überprüfen, ob sich der PODRacer über den Boden in +/-X- und +/-Y-Richtung bei 0-Thrust bewegt.
+
+            -Y
+            |
+      +X-Y  |  -X-Y
+    +X -----|-------
+      +X+Y  |  -X+Y
+            |
+            +Y
+        <SÜDEN>
+    Verkabelungsanschluss
+
+    Es ist normal, dass der PODRacer vorwärts/rückwärts oder seitlich (links/rechts) drifted.
+    Dies kann durch Wetterbedingungen (Wind), schlecht kalibrierte Hardware, falsche Einstellungen des Flugcontrollers usw. verursacht werden.
+
+    Während des Schwebeflugs sollte der PODRacer in keiner Richtung driften.
+    Mit dem PMW3901 können wir jede Bewegung erkennen und neue Empfänger-Kanalbefehle berechnen.
+
+    Beispiel:
+      Vorwärts-Drift:
+      Der PODRacer rutscht während des Schwebens nach vorne. Das bedeutet, dass die hinteren Motoren schneller drehen als die vorderen (oder der Schubpropeller ist zu schnell).
+      Um in die Rückwärtsrichtung zu gehen, sollte der Flugcontroller die Geschwindigkeit der vorderen Motoren erhöhen. Dies geschieht, wenn der Nick-Befehl auf Rückwärts gesetzt wird (Gimbal bewegt sich nach unten).
+
+      Rückwärts-Drift:
+      Der Nick-Befehl wird auf Vorwärts gesetzt (Gimbal bewegt sich nach oben).
+
+      Links-Drift:
+      Korrektur mit Roll - ROLL-Gimbal bewegt sich nach rechts.
+
+      Rechts-Drift:
+      Korrektur mit Roll - ROLL-Gimbal bewegt sich nach links.
+
+      Um ein Überschwingen zu vermeiden, wird ein PID-Controller verwendet, um die Drift-Werte anzupassen.
+
+      Dieser angepasste Rutschwert (für X/Y) wird verwendet, um neue Kanalwerte zu berechnen (Werte zwischen 1000-2000).
+      Keine Drift - Kanalwert für Roll, Nick (Pitch) und Gier (Yaw) sollte 1500 sein.
+**/
+
+class PMW3901OpticalFlow : public ISensor<TSensorPMW3901>
+{
+public:
+    PMW3901OpticalFlow(uint8_t csPin);
+    ~PMW3901OpticalFlow() {} // Virtueller Destruktor für Polymorphie
+    void update(TSensorPMW3901 *sensorData) override;
+    bool sensorInit(TSensorPMW3901 *sensorData) override;
+
+private:
+    uint8_t csPin;
+    Bitcraze_PMW3901 *flow;
+    TSensorPMW3901 *sensorPMW3901;
+
+    // rawX/Y speichert die Rohwerte des Sensors für X und Y
+    // wird später genutzt um sie auf slipAdjX und slipAdjY auf zu addieren
+    int16_t rawX, rawY;
+    int16_t rawAdjX, rawAdjY;
+    long rawXnormalized, rawYnormalized;
+
+    // geben an, wieviel Drift für X und Y aktuell gemessen wurden
+    // ROLL-Achse - drift nach links/rechts
+    // PITCH-ACHSE - drift nach vorwärts/rückwärts
+    double slip2RollAxis, slip2PitchAxis;
+
+    // adjustierter DriftWert für X/Y
+    double slipAdjX, slipAdjY;
+
+    // PID-Controller für X+Y
+    PID *pidX, *pidY;
+
+    uint8_t flowCounter;
+
+    // north = wiring pins are south, north=flight direction
+    //
+    // [0]    direction                 : 0=North, 1=WEST, 2=EAST, 3=SOUTH
+    // [1..4] rawXY multiplier +1/-1    : [1] Multiplier for X [2] Multiplier for Y
+    // Example : NORTH direction        : [0][+1][-1]
+    // Example : WEST direction         : [1][-1][+1]
+    // Example : EAST direction         : [2][+1][-1]
+    // Example : SOUTH direction        : [3][-1][+1]
+
+    // Sensor Ausrichtung
+    // NORD => Obere Kante (Befestigungslöscher) => Flugrichtung
+    // SÜD  => Layout - PINs
+    // direction[0]         = 0=NORTH, 1=WEST, 2= EAST, 3=SOUTH
+    // direction[1]         = Multiplier für X (* +1)
+    // direction[2]         = Multiplier für Y (* -1)
+    //
+    // Beispiel:
+    // direction[0]         = 0=NORTH   => [1]= +1   [2] = -1
+    // direction[0]         = 1=WEST    => [1]= -1   [2] = +1
+    // direction[0]         = 2=EAST    => [1]= +1   [2] = -1
+    // direction[0]         = 3=SOUTH   => [1]= -1   [2] = +1
+
+    int8_t direction[3] = {0, +1, -1};
+};
+
+extern PMW3901OpticalFlow *sensorPMW3901;
+
+#endif

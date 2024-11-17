@@ -29,7 +29,7 @@ void mixerTask(void *parameter)
 
   Serial.println("Mixer running...");
 
-  while (1)
+  while (!generalFreeRTOSError) // bei globalen Fehlern wird der Task abgebrochen
   {
     // Der Mixer liest zuerst alle Queues aus und speichert die
     // Daten lokal in seinen Structs, anschließend beginnt er die Daten
@@ -38,6 +38,10 @@ void mixerTask(void *parameter)
     // am Ende führt er ein Update der globael TDataAll Struktur durch
     // und setzt folgende EventBits: BIT_RECEIVER | BIT_WEBSERVER
     //
+    // Receiver und Webserver lesen ihre Daten aus der globalen Struktur
+    // Hintergrund: das ist einfacher, als zwei Objekte in eine Queue für RECV und ein Obj. für WEBServer zu setzen
+    //              weniger overhead
+    //
 
     // ---------------------------------------------------------------------------
     // ReceiverTask auslesen
@@ -45,21 +49,24 @@ void mixerTask(void *parameter)
     if (xQueueReceive(queueReceiver, &lokalRCData, 0) == pdPASS)
     {
       // xSemaphoreTake(xTDataAllMutex, MUTEX_WAIT_TIMEOUT);
+      // An dieser Stelle ist ein Mutex nicht notwendig, da der Mixer aktuell der einzige Task ist, der verändern kann
+      // l
       lokalDataAll.rc = lokalRCData;
       // xSemaphoreGive(xTDataAllMutex);
     }
-    else {
+    else
+    {
       if (CHECK_BIT(LOG_MASK_MIXER, LOGGING_BIT) && CHECK_BIT(LOG_MASK_MIXER, LOGGING_MIX_R1))
       {
-        logger->message("No QUEUE-Data from receiver", WARN, millis(), "MIXER","READ");
+        logger->message("No QUEUE-Data from receiver", WARN, millis(), "MIXER", "READ");
       }
     }
-    // BEACHTEN: über den IF-Konstrukt wird gesteuert ob überhaupt eine Logausgabe stattfinden kann
+    // BEACHTEN: über den IF-Konstrukt steuert ob überhaupt eine Logausgabe stattfinden kann
     // nachfolgende ausgabe ist nur für Testzwecke gedacht
     if (CHECK_BIT(LOG_MASK_MIXER, LOGGING_BIT) && CHECK_BIT(LOG_MASK_MIXER, LOGGING_MIX_R1))
     {
       memcpy(lokalRCData.new_channels, lokalRCData.raw_channels, sizeof(lokalRCData.new_channels));
-      logger->info(lokalRCData, millis(), "MIXER", "R_RC");
+      logger->info(lokalRCData, millis(), "MIXER", "R_IN");
     }
 
     // ---------------------------------------------------------------------------
@@ -112,21 +119,27 @@ void mixerTask(void *parameter)
 
     if (xSemaphoreTake(xTDataAllMutex, (TickType_t)10) == pdTRUE)
     {
-
-      globalData.status = lokalDataAll.status;
-      globalData.hover = lokalDataAll.hover;
-      globalData.sdist = lokalDataAll.sdist;
-      globalData.oflow = lokalDataAll.oflow;
-      globalData.steering = lokalDataAll.steering;
-      globalData.rc = lokalDataAll.rc;
+      memcpy(&globalData.hover, &lokalDataAll.hover, sizeof(lokalDataAll.hover));
+      memcpy(&globalData.sdist, &lokalDataAll.sdist, sizeof(lokalDataAll.sdist));
+      memcpy(&globalData.oflow, &lokalDataAll.oflow, sizeof(lokalDataAll.oflow));
+      memcpy(&globalData.steering, &lokalDataAll.steering, sizeof(lokalDataAll.steering));
+      memcpy(&globalData.status, &lokalDataAll.status, sizeof(lokalDataAll.status));
+      memcpy(&globalData.rc, &lokalDataAll.rc, sizeof(lokalDataAll.rc));
 
       if (CHECK_BIT(LOG_MASK_MIXER, LOGGING_BIT) && CHECK_BIT(LOG_MASK_MIXER, LOGGING_MIX_WRITE))
       {
-        logger->info(globalData, millis(), "MIXER", "WRITE");
+        // Serial.println("xxxxxxx");
+        logger->info(globalData.rc, millis(), "MIXER", "OUT");
       }
       xSemaphoreGive(xTDataAllMutex);
     }
-
+    else
+    {
+      if (CHECK_BIT(LOG_MASK_MIXER, LOGGING_BIT) && CHECK_BIT(LOG_MASK_MIXER, LOGGING_MIX_WRITE))
+      {
+        logger->message("xTDataAllMutex failed", WARN, millis(), "MIXER", "WRITE");
+      }
+    }
     // Setze die Ereignisbits, um die anderen Tasks zu benachrichtigen
     xEventGroupSetBits(xEventGroup, BIT_RECEIVER | BIT_WEBSERVER);
 

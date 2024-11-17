@@ -1,6 +1,6 @@
 #include "HoverTask.h"
 
-void HoverTask(void *parameter)
+void hoverTask(void *parameter)
 {
 
   TDataHover lokalHoverData;
@@ -8,7 +8,7 @@ void HoverTask(void *parameter)
 
   controller = new HoverController();
 
-  while (1)
+  while (!generalFreeRTOSError) // bei globalen Fehlern wird der Task abgebrochen
 
     if (xQueueReceive(queueHoverRcv, &lokalHoverData, 0) == pdPASS)
     {
@@ -16,10 +16,10 @@ void HoverTask(void *parameter)
       // berechnete Daten werden direkt in lokalHoverData gespeichert
       controller->read(lokalHoverData);
       if (CHECK_BIT(LOG_MASK_HOVER, LOGGING_BIT) && CHECK_BIT(LOG_MASK_HOVER, LOGGING_HOVER_READ))
-        logger->info(lokalHoverData,millis(), "HOVER","QUE_R");
+        logger->info(lokalHoverData, millis(), "HOVER", "QUE_R");
     }
-    xQueueSend(queueHoverSend, &lokalHoverData, portMAX_DELAY);
-    if (CHECK_BIT(LOG_MASK_HOVER, LOGGING_BIT) && CHECK_BIT(LOG_MASK_HOVER, LOGGING_HOVER_SEND))
-      logger->info(lokalHoverData,millis(), "HOVER","QUE_S");
-    vTaskDelay(pdMS_TO_TICKS(LOOP_TIME));
+  xQueueSend(queueHoverSend, &lokalHoverData, portMAX_DELAY);
+  if (CHECK_BIT(LOG_MASK_HOVER, LOGGING_BIT) && CHECK_BIT(LOG_MASK_HOVER, LOGGING_HOVER_SEND))
+    logger->info(lokalHoverData, millis(), "HOVER", "QUE_S");
+  vTaskDelay(pdMS_TO_TICKS(LOOP_TIME));
 }

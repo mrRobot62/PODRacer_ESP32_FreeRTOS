@@ -3,11 +3,9 @@
 
 #include <Arduino.h>
 #include "IController.h"
-#include "ISensor.h"
-#include "SensorPMW3901.h"
-#include "MockPMW3901OFlowSensor.h"
 #include "Utils.h"
 #include <data_struct.h>
+#include "globals.h"
 
 class HoverController : public IController<TDataHover>
 {
@@ -17,7 +15,7 @@ public:
     void read(TDataHover &data) override;
 
 private:
-    ISensor<TSensorPMW3901> *pmw3901;
+    // ISensor<TSensorPMW3901> *pmw3901;
     TSBUSGlobalDefaultValues globalValues;
 };
 

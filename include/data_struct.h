@@ -6,7 +6,6 @@
 #include <freertos/queue.h>
 #include <freertos/event_groups.h>
 #include <freertos/semphr.h>
-
 #include "globals.h"
 
 #define MUTEX_WAIT_TIMEOUT pdMS_TO_TICKS(50)
@@ -178,6 +177,63 @@ typedef struct __attribute__((packed))
   uint16_t distanceRear = 0;
   bool prevent_arming = true;
 } TDataSurface;
+
+typedef struct __attribute__((packed))
+{
+  bool isFailsafeActive = false;
+
+  // Roh-Werte der Sensoren
+  double rawHeightFront; // VL53l1 ToF
+  double rawHeightRear;  // TFPlus Lidar
+  double rawHeight;
+  double rawYaw;
+  double rawDrift[2] = {0.0, 0.0}; // OpticalFlowSensor
+
+  double gyroX, gyroY;
+  double accelX, accelY, accelZ;
+  double accelRoll, accelPitch;
+
+  // PIDController-Daten
+  // für Distanzsensoren
+  double pidInput;
+  double pidOutput;
+  double pidSetpoint;
+
+  // für OpticalFlow
+  double pidYawInput;
+  double pidYawOutput;
+  double pidYawSetpoint;
+
+  double pidDriftXInput;
+  double pidDriftXOutput;
+  double pidDriftYInput;
+  double pidDriftYOutput;
+  double pidDriftSetpoint;
+
+} TDataComplementaryFilter;
+
+typedef struct __attribute__((packed))
+{
+  uint16_t targetHeight = 500;
+  uint16_t targetDrift = 0;
+  uint16_t targetYaw = 0;
+  //
+  // Komplementär Gains für IMU
+  uint8_t alpha = 98; // wird durch 100 geteilt => 0.98
+  uint8_t beta = 2;   // wird durch 100 geteilt = > 0.02
+
+  // PIDController Einstellungen
+  uint16_t pidKValues[3] = {200, 500, 100};    // Kp, Ki, Kd (wird durch 100 geteilt) 2.0, 5.0, 1.0
+  uint16_t pidYawValues[3] = {100, 50, 10};    // Kp, Ki, Kd (wird durch 100 geteilt) 1.0, 0.5, 0.1
+  uint16_t pidDriftXValues[3] = {100, 50, 10}; // Kp, Ki, Kd (wird durch 100 geteilt) 1.0, 0.5, 0.1
+  uint16_t pidDriftYValues[3] = {100, 50, 10}; // Kp, Ki, Kd (wird durch 100 geteilt) 1.0, 0.5, 0.1
+
+  int16_t pidKLimit[2] = {-100, 100};
+
+  // Failsafe
+  uint16_t failsafeTimeout = 1000;
+
+} TDataComplementaryFilterCfg;
 
 typedef struct __attribute__((packed))
 {

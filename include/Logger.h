@@ -128,6 +128,9 @@ private:
     void logSpecificData(const TDataStatus tdata, uint8_t level, unsigned long ms, const char *domain, const char *subdomain, bool useUDP = false, bool cr = true);
     void logSpecificData(const TESP32Memory tdata, uint8_t level, unsigned long ms, const char *domain, const char *subdomain, bool useUDP = false, bool cr = true);
 
+    void logSpecificData(const TDataComplementaryFilter tdata, uint8_t level, unsigned long ms, const char *domain, const char *subdomain, bool useUDP = false, bool cr = true);
+    void logSpecificData(const TDataComplementaryFilterCfg tdata, uint8_t level, unsigned long ms, const char *domain, const char *subdomain, bool useUDP = false, bool cr = true);
+
     void logSpecificData2(const TDataGlobal, unsigned long ms, bool cr = true);
     void logSpecificData2(const TDataStatus, unsigned long ms, bool cr = true);
     void logSpecificData2(const TESP32Memory, unsigned long ms, bool cr = true);

@@ -7,21 +7,19 @@
 QueueHandle_t queueBlink;
 
 // Funktion zum Lesen der Bitmaske mit Mutex-Schutz
-uint8_t readBitmask()
+void readBitmask(uint8_t *bitmask)
 {
-  uint8_t localBitmask;
   if (xSemaphoreTake(xbitmaskBlinkMutex, portMAX_DELAY) == pdTRUE)
   {
-    localBitmask = blink_mask;
+    memcpy(bitmask, blink_mask, sizeof(blink_mask));
     xSemaphoreGive(xbitmaskBlinkMutex);
   }
-  return localBitmask;
 }
 
 void blinkTask(void *parameter)
 {
   uint8_t ledPin = ((uint32_t *)parameter)[0];
-  uint8_t bitFrequency = ((uint32_t *)parameter)[1];
+  uint8_t ledIndex = ((uint32_t *)parameter)[1];
   uint8_t bitControl = ((uint32_t *)parameter)[2];
 
   // GPIO-Modus für die LEDs setzen
@@ -33,20 +31,21 @@ void blinkTask(void *parameter)
   {
 
     // Bitmaske lesen
-    uint8_t localBitmask = readBitmask();
+    uint8_t localBitmask[3];
+    readBitmask(localBitmask);
 
     // Prüfen, ob die LED aktiviert ist
-    if (localBitmask & bitControl)
+    if (localBitmask[ledIndex] & bitControl)
     {
       // Frequenz bestimmen
       uint32_t blinkDelay = 0;
-      if (localBitmask & 0x01)
+      if (localBitmask[ledIndex] & 0x01)
         blinkDelay = 50;
-      if (localBitmask & 0x02)
+      if (localBitmask[ledIndex] & 0x02)
         blinkDelay = 200;
-      if (localBitmask & 0x04)
+      if (localBitmask[ledIndex] & 0x04)
         blinkDelay = 500;
-      if (localBitmask & 0x08)
+      if (localBitmask[ledIndex] & 0x08)
         blinkDelay = 1000;
 
       if (blinkDelay > 0)

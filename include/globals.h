@@ -2,7 +2,7 @@
 #define _GLOBALS_H_
 
 // #define USE_MOCK_SBUS
-#define USE_MOCK_PMW3901
+// #define USE_MOCK_PMW3901
 
 //
 // Bemekrung : BIT0-7 sind nicht die Position, sondern der Wert an der Postion
@@ -38,6 +38,9 @@
 #define LED_ERR1 14  // rot (Fehler)
 #define LED_ERR2 27  // rot (Fehler)
 
+// PMW3901 wird über SPI angesteuert
+#define PIN_CS_PMW3901 5
+
 extern uint8_t LOG_MASK_RECEIVER;
 extern uint8_t LOG_MASK_MIXER;   //
 extern uint8_t LOG_MASK_SURFACE; //
@@ -49,7 +52,9 @@ extern uint8_t MOCK_DATA_MASK_PMW3901;
 extern uint8_t MOCK_DATA_MASK_TFMini;
 extern uint8_t MOCK_DATA_MASK_VL53X1;
 
-extern uint8_t blink_mask;
+extern uint8_t blink_mask[3];
+
+extern bool generalFreeRTOSError;
 
 #define SBUS_RX_PIN 16
 #define SBUS_TX_PIN 17

@@ -9,12 +9,12 @@
 SemaphoreHandle_t xMutex;
 TDataRC queueRCData;
 
-void updateMaskBlinkPattern(uint8_t newMask)
+void updateMaskBlinkPattern(uint8_t newMask, uint8_t ledIndex)
 {
   // Zugriff auf die Bitmaske mit Mutex schützen
   if (xSemaphoreTake(xbitmaskBlinkMutex, portMAX_DELAY) == pdTRUE)
   {
-    blink_mask = newMask;
+    blink_mask[ledIndex] = newMask;
     xSemaphoreGive(xbitmaskBlinkMutex);
   }
 }
@@ -64,7 +64,7 @@ void receiverTask(void *parameter)
   receiver = new ReceiverSBUS(SBUS_RX_PIN, SBUS_TX_PIN);
 #endif
 
-  while (1)
+  while (!generalFreeRTOSError) // bei globalen Fehlern wird der Task abgebrochen
   {
     lokalRCData = new TDataRC();
     lokalHoverData = new TDataHover();
@@ -150,18 +150,28 @@ void receiverTask(void *parameter)
       // Blink-Pattern
       //--------------------------------------------------------------
       if (lokalRCData->is_armed)
-        updateMaskBlinkPattern(0b00010001); // LED_STATE, 100ms
+      {
+        updateMaskBlinkPattern(0b00010001, 0); // LED_STATE, 100ms
+        updateMaskBlinkPattern(0b00000000, 1); // LED_ERR1 off
+        updateMaskBlinkPattern(0b00000000, 2); // LED_ERR2 off
+      }
       else
       {
-        if (CHECK_BIT(lokalRCData->armingMask, BIT0))
+        if (CHECK_BIT(lokalRCData->armingMask, BIT0) || CHECK_BIT_PATTERN(lokalRCData->armingMask, 0b11111000) == false)
         {
           // disarmed, nicht in Grundeinstellung
-          updateMaskBlinkPattern(0b00111010); // LED1 1000ms, LED2 200ms
+          updateMaskBlinkPattern(0b00011000, 0); // LED_STATE & LED_ERR1 1000ms
+          updateMaskBlinkPattern(0b00100001, 1); // LED_ERR1 fast
+          updateMaskBlinkPattern(0b00000000, 2); // LED_ERR2 off
         }
-        else
+        else 
         {
-          updateMaskBlinkPattern(0b00011000); // LED_STATE, LED_ERR1 => 1000ms
+          // normales DISARM BlinkPattern
+          updateMaskBlinkPattern(0b00011000, 0); // LED_STATE => 1000ms
+          updateMaskBlinkPattern(0b00000000, 1); // LED_ERR1 off
+          updateMaskBlinkPattern(0b00000000, 2); // LED_ERR2 off
         }
+
       }
     }
     else

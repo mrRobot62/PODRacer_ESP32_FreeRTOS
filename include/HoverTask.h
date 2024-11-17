@@ -7,6 +7,6 @@
 #include "Logger.h"
 
 
-void HoverTask(void *parameter);
+void hoverTask(void *parameter);
 
 #endif

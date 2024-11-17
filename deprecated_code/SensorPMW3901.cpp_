@@ -1,0 +1,83 @@
+#include "SensorPMW3901.h"
+
+PMW3901OpticalFlow::PMW3901OpticalFlow(uint8_t csPin)
+{
+    this->csPin = csPin;
+}
+
+bool PMW3901OpticalFlow::sensorInit(TSensorPMW3901 *sensorData)
+{
+    flow = new Bitcraze_PMW3901(csPin);
+    if (flow == nullptr)
+    {
+        logger->message("PMW3901 could not be initialized", 1, millis(), "PMW", "3901");
+        return false;
+    }
+    slip2RollAxis = slip2PitchAxis = 0.0;
+    rawX = rawY = rawAdjX = rawAdjY = 0;
+    flowCounter = 0;
+
+    // if direction==NORTH or direction==EAST, than sensor is assemble in NORTH-SOUTH direction
+    // Vorbereitung des PID-Controllers basierend auf die Ausrichtung des Sensors
+    if ((direction[0] == 0) || (direction[0] == 2))
+    {
+        pidX = new PID(
+            &slipAdjX,                               // Hier füllt der PID-Controller den adjustierten X Wert (IST-Wert X)
+            &slip2RollAxis,                          // Hier füllt der PID-Controller den adjustierten Y Wert (IST-Wert Y)
+            &sensorData->setPointX,                  // der gewünscht SET-POINT (SOLL-Wert)
+            double(sensorData->pidAGain[0] / 100.0), // kP value
+            double(sensorData->pidAGain[1] / 100.0), // Ki value
+            double(sensorData->pidAGain[2] / 100.0), // kD value
+            DIRECT);
+        pidY = new PID(
+            &slipAdjY,                               // Hier füllt der PID-Controller den adjustierten X Wert (IST-Wert X)
+            &slip2PitchAxis,                         // Hier füllt der PID-Controller den adjustierten Y Wert (IST-Wert Y)
+            &sensorData->setPointY,                  // der gewünscht SET-POINT (SOLL-Wert)
+            double(sensorData->pidAGain[0] / 100.0), // kP value
+            double(sensorData->pidAGain[1] / 100.0), // Ki value
+            double(sensorData->pidAGain[2] / 100.0), // kD value
+            DIRECT);
+    }
+    else if ((direction[0] == 1) || (direction[0] == 3))
+    {
+        // direction==WEST or direction==SOUTH
+        pidX = new PID(
+            &slipAdjX,                               // Hier füllt der PID-Controller den adjustierten X Wert (IST-Wert X)
+            &slip2PitchAxis,                         // Hier füllt der PID-Controller den adjustierten Y Wert (IST-Wert Y)
+            &sensorData->setPointX,                  // der gewünscht SET-POINT (SOLL-Wert)
+            double(sensorData->pidAGain[0] / 100.0), // kP value
+            double(sensorData->pidAGain[1] / 100.0), // Ki value
+            double(sensorData->pidAGain[2] / 100.0), // kD value
+            DIRECT);
+        pidY = new PID(
+            &slipAdjY,                               // Hier füllt der PID-Controller den adjustierten X Wert (IST-Wert X)
+            &slip2RollAxis,                          // Hier füllt der PID-Controller den adjustierten Y Wert (IST-Wert Y)
+            &sensorData->setPointY,                  // der gewünscht SET-POINT (SOLL-Wert)
+            double(sensorData->pidAGain[0] / 100.0), // kP value
+            double(sensorData->pidAGain[1] / 100.0), // Ki value
+            double(sensorData->pidAGain[2] / 100.0), // kD value
+            DIRECT);
+    }
+
+    pidX->SetMode(AUTOMATIC);
+    pidY->SetMode(AUTOMATIC);
+    pidX->SetOutputLimits(-OFLOW_PID_OUTPUT_LIMIT, OFLOW_PID_OUTPUT_LIMIT);
+    pidY->SetOutputLimits(-OFLOW_PID_OUTPUT_LIMIT, OFLOW_PID_OUTPUT_LIMIT);
+    pidX->SetSampleTime(LOOP_TIME);
+    pidY->SetSampleTime(LOOP_TIME);
+
+    if (flow->begin() == false)
+    {
+        logger->message("PMW3901 failed", millis(), 1, "PMW", "Z71");
+        return false;
+    }
+
+    logger->message("PMW3901 ready", millis(), 3, "PMW", "3901");
+
+    // Sensor ist aktiv und kann genutzt werden
+    return false;
+}
+
+void PMW3901OpticalFlow::update(TSensorPMW3901 *sensorData)
+{
+}
