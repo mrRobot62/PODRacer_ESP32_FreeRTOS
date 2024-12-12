@@ -13,7 +13,9 @@ void ComplementaryFilterNoIMU::update(TDataComplementaryFilter *filterData)
     }
     filterData->isFailsafeActive = false;
 
+    //--------------------------------------------------------------------------------------
     // Lese LiDAR-Daten
+    //--------------------------------------------------------------------------------------
 
     // Zur Erinnerung. sensorRear = TFPlus (lidar), sensorFront=VL53L1 (ToF)
 
@@ -25,7 +27,9 @@ void ComplementaryFilterNoIMU::update(TDataComplementaryFilter *filterData)
     }
     filterData->rawHeightRear = double(heightRear);
 
+    //--------------------------------------------------------------------------------------
     // auslesen des ToF-Sensors
+    //--------------------------------------------------------------------------------------
     filterData->rawHeightFront = sensorFront->readRangeContinuousMillimeters();
 
     if (!sensorFront->timeoutOccurred())

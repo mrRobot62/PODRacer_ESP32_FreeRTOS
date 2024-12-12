@@ -63,10 +63,14 @@ void ComplementaryFilterIMU::calculateOrientation(TDataComplementaryFilter *filt
     float accelZ = a.acceleration.z;
 
     // Berechne Yaw durch Integration
+    // Der GyroZ-Wert (Drehgeschwindigkeit um die Z-Achse) liefert die Winkelgeschwindigkeit für Yaw (Gieren).
+    // Über Zeitintegration kann die aktuelle Yaw-Position berechnet werden:
+    // der rawYaw Wert wird später für den PID-Controller als pidYawInput verwendet
     filterData->rawYaw += gyroZ * dt;
 
     // Berechne Pitch und Roll aus Beschleunigungssensor
-    float accelPitch = atan2(accelY, accelZ) * 180 / PI;
+    //
+    float accelPitch = atan2(accelY, accelZ) * 180 / PI; // absoluter PITCH Winkel aus den AccelerometerDaten
     float accelRoll = atan2(accelX, accelZ) * 180 / PI;
 
     // Komplementärfilter anwenden
@@ -84,7 +88,9 @@ void ComplementaryFilterIMU::update(TDataComplementaryFilter *filterData)
     }
     filterData->isFailsafeActive = false;
 
+    //--------------------------------------------------------------------------------------
     // Lese LiDAR-Daten
+    //--------------------------------------------------------------------------------------
 
     // Zur Erinnerung. sensorRear = TFPlus (lidar), sensorFront=VL53L1 (ToF)
 
@@ -96,7 +102,9 @@ void ComplementaryFilterIMU::update(TDataComplementaryFilter *filterData)
     }
     filterData->rawHeightRear = double(heightRear);
 
+    //--------------------------------------------------------------------------------------
     // auslesen des ToF-Sensors
+    //--------------------------------------------------------------------------------------
     filterData->rawHeightFront = sensorFront->readRangeContinuousMillimeters();
 
     if (!sensorFront->timeoutOccurred())

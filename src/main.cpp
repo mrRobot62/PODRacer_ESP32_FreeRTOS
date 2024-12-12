@@ -64,6 +64,13 @@ TDataAll globalData;
 SemaphoreHandle_t xTDataAllMutex;
 SemaphoreHandle_t xbitmaskBlinkMutex; // Mutex zum Schutz der Bitmaske für den BlinkTask
 
+// Sensor-Semaphoren
+SemaphoreHandle_t xSemaSensorOFlow; // PMW3901
+SemaphoreHandle_t xSemaSensorLidar; // TFPlus
+SemaphoreHandle_t xSemaSensorTOF;   // VL53X1
+SemaphoreHandle_t xSemaSensorIMU;   // MPU6xxxx
+SemaphoreHandle_t xSemaSensorUS;    // Ultraschall
+
 EventGroupHandle_t xEventGroup;
 
 //
@@ -97,14 +104,24 @@ uint8_t MOCK_DATA_MASK_MIXER = 0b00000001;
 uint8_t ch_map[NUM_CHANNELS] = {0, 1, 7, 3, 4, 2, 5, 6};
 
 TSBUSGlobalDefaultValues gSBUSDefaultValues;
-uint8_t blink_mask[3];
+Sim
+
+    uint8_t blink_mask[3];
 
 bool generalFreeRTOSError;
 
 char __buf__[50];
 
+extern "C"
+{
+  extern const int uxTopUsedPriority;
+  __attribute__((section(".rodata"))) const int uxTopUsedPriority =
+      configMAX_PRIORITIES - 1;
+}
+
 void setup()
 {
+
   generalFreeRTOSError = false;
   Serial.begin(115200);
   globalCFG.initFlash(false); // explizit KEIN komplettes Löschen des Flashes durchführen

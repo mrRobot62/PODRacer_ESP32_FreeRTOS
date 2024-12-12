@@ -34,8 +34,17 @@
 #define ARMING_BIT BIT1
 #define ARM_SW_BIT BIT2
 
-#define LED_STATE 12 // blau (RUNNING, Armed, Disarmed)
-#define LED_ERR1 14  // rot (Fehler)
+//---------------------------------------------------
+// DEBUGGEN - es dürfen die JTAG-Pins nicht für
+// andere Dinge genutzt werden !!!!
+//
+// TMS => PIN 14 (GPIO)
+// TCK => PIN 13 (GPIO)
+// TDO => PIN 15 (GPIO)
+// TDI => PIN 12 (GPIO)
+
+#define LED_STATE 32 // blau (RUNNING, Armed, Disarmed)
+#define LED_ERR1 33  // rot (Fehler)
 #define LED_ERR2 27  // rot (Fehler)
 
 // PMW3901 wird über SPI angesteuert

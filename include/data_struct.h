@@ -358,4 +358,10 @@ extern SemaphoreHandle_t xTDataAllMutex;
 extern SemaphoreHandle_t xbitmaskBlinkMutex;
 extern EventGroupHandle_t xEventGroup;
 
+extern SemaphoreHandle_t xSemaSensorOFlow; // PMW3901
+extern SemaphoreHandle_t xSemaSensorLidar; // TFPlus
+extern SemaphoreHandle_t xSemaSensorTOF;   // VL53X1
+extern SemaphoreHandle_t xSemaSensorIMU;   // MPU6xxxx
+extern SemaphoreHandle_t xSemaSensorUS;    // Ultraschall
+
 #endif

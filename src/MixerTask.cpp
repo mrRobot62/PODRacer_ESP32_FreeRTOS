@@ -13,9 +13,9 @@ void mixerTask(void *parameter)
   //
   //
 
-  TDataAll lokalDataAll;
+  static TDataAll lokalDataAll;
 
-  TDataRC lokalRCData;
+  static TDataRC lokalRCData;
   TDataSurface lokalSurfaceData;
   TDataOFlow lokalOFlowData;
   TDataHover lokalHoverData;

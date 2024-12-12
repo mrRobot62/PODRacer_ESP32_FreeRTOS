@@ -31,9 +31,9 @@ void ComplementaryFilterBase::updateOpticalFlow(TDataComplementaryFilter *filter
         filterData->rawYaw += deltaX * 0.1; // Beispiel: Skalierung in Grad pro Pixelwert
 
         // Delta-Werte in Yaw-Änderung und Drift umrechnen
-        filterData->rawYaw += deltaX * 0.1;       // Beispielskalierung: 0.1 Grad pro Pixel
-        filterData->rawDrift[0] += deltaX * 0.01; // Beispielskalierung: mm pro Pixel
-        filterData->rawDrift[1] += deltaY * 0.01; // Beispielskalierung: mm pro Pixel
+        filterData->rawYaw += deltaX * 0.1;        // Beispielskalierung: 0.1 Grad pro Pixel
+        filterData->rawDrift[0] += -deltaX * 0.01; // Beispielskalierung: mm pro Pixel
+        filterData->rawDrift[1] += deltaY * 0.01;  // Beispielskalierung: mm pro Pixel
     }
     else
     {
@@ -92,7 +92,7 @@ void ComplementaryFilterBase::begin(TDataComplementaryFilter *filterData)
         double(cfg->pidDriftXValues[2] / 100.0),
         DIRECT);
 
-    driftXPID = new PID(
+    driftYPID = new PID(
         &filterData->pidDriftYInput,
         &filterData->pidDriftYOutput,
         &filterData->pidDriftSetpoint,
