@@ -1,9 +1,9 @@
 #include "ComplementaryFilterIMU.h"
 
-ComplementaryFilterIMU::ComplementaryFilterIMU(HardwareSerial *lidarBus, uint8_t pinCSPMW3901, TDataComplementaryFilterCfg *cfg)
+ComplementaryFilterIMU::ComplementaryFilterIMU(HardwareSerial *lidarBus, uint8_t pinCSPMW3901, TSensorCFG *cfg)
     : ComplementaryFilterBase(lidarBus, pinCSPMW3901, cfg) {}
 
-void ComplementaryFilterIMU::calibrateGyro(TDataComplementaryFilter *filterData)
+void ComplementaryFilterIMU::calibrateGyro(TDataSensors *filterData)
 {
     const int samples = 500;
     float sumX = 0, sumY = 0, sumZ = 0;
@@ -27,7 +27,7 @@ void ComplementaryFilterIMU::calibrateGyro(TDataComplementaryFilter *filterData)
     Serial.println("Gyroskop kalibriert!");
 }
 
-void ComplementaryFilterIMU::begin(TDataComplementaryFilter *filterData)
+void ComplementaryFilterIMU::begin(TDataSensors *filterData)
 {
 
     // Initialisiere MPU6050
@@ -47,7 +47,7 @@ void ComplementaryFilterIMU::begin(TDataComplementaryFilter *filterData)
     calibrateGyro(filterData);
 }
 
-void ComplementaryFilterIMU::calculateOrientation(TDataComplementaryFilter *filterData)
+void ComplementaryFilterIMU::calculateOrientation(TDataSensors *filterData)
 {
     sensors_event_t a, g, temp;
     mpu->getEvent(&a, &g, &temp);
@@ -78,7 +78,7 @@ void ComplementaryFilterIMU::calculateOrientation(TDataComplementaryFilter *filt
     roll = cfg->alpha * (roll + gyroY * dt) + cfg->beta * accelRoll;
 }
 
-void ComplementaryFilterIMU::update(TDataComplementaryFilter *filterData)
+void ComplementaryFilterIMU::update(TDataSensors *filterData)
 {
     if (checkFailsafe())
     {

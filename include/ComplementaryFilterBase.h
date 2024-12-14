@@ -20,10 +20,10 @@
 class ComplementaryFilterBase
 {
 public:
-    ComplementaryFilterBase(HardwareSerial *lidarBus, uint8_t pinCSPMW3901, TDataComplementaryFilterCfg *cfg);
+    ComplementaryFilterBase(HardwareSerial *lidarBus, uint8_t pinCSPMW3901, TSensorCFG *cfg);
     virtual ~ComplementaryFilterBase();
-    void begin(TDataComplementaryFilter *filterData);
-    virtual void update(TDataComplementaryFilter *filterData) = 0; // Reine virtuelle Methode
+    void begin(TDataSensors *filterData);
+    virtual void update(TDataSensors *filterData) = 0; // Reine virtuelle Methode
     void setTargetHeight(uint16_t height);
     float getYaw() const;
     float getHeight() const;
@@ -38,12 +38,12 @@ protected:
     VL53L1X *sensorFront;
     Bitcraze_PMW3901 *sensorOptFlow;
 
-    TDataComplementaryFilterCfg *cfg;
-    TDataComplementaryFilter *lokalFilterData;
+    TSensorCFG *cfg;
+    TDataSensors *lokalFilterData;
 
-    void updateOpticalFlow(TDataComplementaryFilter *filterData);
-    void updateYawCompensation(TDataComplementaryFilter *filterData);
-    void updateDriftCompensation(TDataComplementaryFilter *filterData);
+    void updateOpticalFlow(TDataSensors *filterData);
+    void updateYawCompensation(TDataSensors *filterData);
+    void updateDriftCompensation(TDataSensors *filterData);
 
     // PID-Controller
     // double targetHeight;

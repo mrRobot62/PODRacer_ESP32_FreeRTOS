@@ -210,30 +210,38 @@ typedef struct __attribute__((packed))
   double pidDriftYOutput;
   double pidDriftSetpoint;
 
-} TDataComplementaryFilter;
+} TDataSensors;
 
 typedef struct __attribute__((packed))
 {
+  // gewünschte Höhe des PODRacers
   uint16_t targetHeight = 500;
+  // range +/- für die SOLL Höhe (490-510)
+  uint16_t targetHeight_offset = 10;
+
+  // wieviel darf der PODRacer im Stillstand über ROLL/PITCH driften
   uint16_t targetDrift = 0;
+  // wieviel darf der PODRacer im Stillstand um YAW driften
   uint16_t targetYaw = 0;
   //
-  // Komplementär Gains für IMU
+  // Komplementär Gains alpha & beta für IMU
   uint8_t alpha = 98; // wird durch 100 geteilt => 0.98
   uint8_t beta = 2;   // wird durch 100 geteilt = > 0.02
 
   // PIDController Einstellungen
+  // für ROLL/PITCH Achse
   uint16_t pidKValues[3] = {200, 500, 100};    // Kp, Ki, Kd (wird durch 100 geteilt) 2.0, 5.0, 1.0
   uint16_t pidYawValues[3] = {100, 50, 10};    // Kp, Ki, Kd (wird durch 100 geteilt) 1.0, 0.5, 0.1
   uint16_t pidDriftXValues[3] = {100, 50, 10}; // Kp, Ki, Kd (wird durch 100 geteilt) 1.0, 0.5, 0.1
   uint16_t pidDriftYValues[3] = {100, 50, 10}; // Kp, Ki, Kd (wird durch 100 geteilt) 1.0, 0.5, 0.1
 
+  // die Ausgabe des PID-Wertes dar das Limit nicht überschreiten
   int16_t pidKLimit[2] = {-100, 100};
 
   // Failsafe
   uint16_t failsafeTimeout = 1000;
 
-} TDataComplementaryFilterCfg;
+} TSensorCFG;
 
 typedef struct __attribute__((packed))
 {
@@ -337,6 +345,8 @@ extern TDataSurface dataSDist;
 extern TDataOFlow dataOFlow;
 extern TESP32Memory espMemory;
 extern TSBUSGlobalDefaultValues gSBUSDefaultValues;
+extern TSensorCFG sensorCFG;
+extern TDataSensors sensorData;
 
 // Ereignisbits
 // aktuell nur für Receiver & Webserver

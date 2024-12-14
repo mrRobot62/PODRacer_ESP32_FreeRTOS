@@ -11,6 +11,7 @@
 #include "globals.h"
 #include "Logger.h"
 #include "MonitoringTask.h"
+#include "SensorWrapperSingleton.h"
 
 #include "Utils.h"
 
@@ -104,9 +105,11 @@ uint8_t MOCK_DATA_MASK_MIXER = 0b00000001;
 uint8_t ch_map[NUM_CHANNELS] = {0, 1, 7, 3, 4, 2, 5, 6};
 
 TSBUSGlobalDefaultValues gSBUSDefaultValues;
-Sim
+TDataSensors sensorData;
+TSensorCFG sensorCFG;
+SensorWrapperSingleton *sensorWrapper;
 
-    uint8_t blink_mask[3];
+uint8_t blink_mask[3];
 
 bool generalFreeRTOSError;
 
@@ -136,6 +139,12 @@ void setup()
   uint8_t DEFAULT_CHANNEL_MAP[NUM_CHANNELS] = {0, 1, 7, 3, 4, 2, 5, 6};
   setChannelMapping(DEFAULT_CHANNEL_MAP);
   logger->info(ch_map);
+
+  // sensorWrapper = SensorWrapperSingleton::getInstance(
+  //   &Serial2,
+  //   PIN_CS_PMW3901,
+  //   sensorCFG);
+
 
   // ------------------------------------------------------------------------------
   // Sensoren initialisieren

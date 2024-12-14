@@ -1,11 +1,11 @@
 #include "SensorWrapperSingleton.h"
 
-SensorWrapperSingleton::SensorWrapperSingleton(HardwareSerial *lidarBus, uint8_t pinCSPMW3901, TDataComplementaryFilterCfg *cfg)
+SensorWrapperSingleton::SensorWrapperSingleton(HardwareSerial *lidarBus, uint8_t pinCSPMW3901, TSensorCFG *cfg)
 {
     sensorOptFlow = new Bitcraze_PMW3901(pinCSPMW3901);
     sensorToF = new VL53L1X();
     sensorLidar = new TFMPlus();
-
+    this->cfg = cfg;
     this->init();
 }
 

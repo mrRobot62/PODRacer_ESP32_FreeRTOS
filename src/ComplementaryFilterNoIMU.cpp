@@ -1,9 +1,9 @@
 #include "ComplementaryFilterNoIMU.h"
 
-ComplementaryFilterNoIMU::ComplementaryFilterNoIMU(HardwareSerial *lidarBus, uint8_t pinCSPMW3901, TDataComplementaryFilterCfg *cfg)
+ComplementaryFilterNoIMU::ComplementaryFilterNoIMU(HardwareSerial *lidarBus, uint8_t pinCSPMW3901, TSensorCFG *cfg)
     : ComplementaryFilterBase(lidarBus, pinCSPMW3901, cfg) {}
 
-void ComplementaryFilterNoIMU::update(TDataComplementaryFilter *filterData)
+void ComplementaryFilterNoIMU::update(TDataSensors *filterData)
 {
     if (checkFailsafe())
     {

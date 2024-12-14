@@ -9,13 +9,13 @@
 class ComplementaryFilterIMU : public ComplementaryFilterBase
 {
 public:
-    ComplementaryFilterIMU(HardwareSerial *lidarBus, uint8_t pinCSPMW3901, TDataComplementaryFilterCfg *cfg);
-    void update(TDataComplementaryFilter *filterData) override;
-    void begin(TDataComplementaryFilter *filterData);
+    ComplementaryFilterIMU(HardwareSerial *lidarBus, uint8_t pinCSPMW3901, TSensorCFG *cfg);
+    void update(TDataSensors *filterData) override;
+    void begin(TDataSensors *filterData);
 
 protected:
-    void calibrateGyro(TDataComplementaryFilter *filterData);
-    void calculateOrientation(TDataComplementaryFilter *filterData);
+    void calibrateGyro(TDataSensors *filterData);
+    void calculateOrientation(TDataSensors *filterData);
 
 private:
     Adafruit_MPU6050 *mpu;

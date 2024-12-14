@@ -116,7 +116,7 @@ void Logger::logSpecificData(const TDataRC tdata, uint8_t level, unsigned long m
     Serial.print(buffer);
 }
 
-void Logger::logSpecificData(const TDataComplementaryFilter tdata, uint8_t level, unsigned long ms, const char *domain, const char *subdomain, bool useUDP, bool cr)
+void Logger::logSpecificData(const TDataSensors tdata, uint8_t level, unsigned long ms, const char *domain, const char *subdomain, bool useUDP, bool cr)
 {
     char lString[5 + 1];
     char arm[3 + 1];
@@ -181,7 +181,7 @@ void Logger::logSpecificData(const TDataComplementaryFilter tdata, uint8_t level
     Serial.print(buffer);
 }
 
-void Logger::logSpecificData(const TDataComplementaryFilterCfg tdata, uint8_t level, unsigned long ms, const char *domain, const char *subdomain, bool useUDP, bool cr)
+void Logger::logSpecificData(const TSensorCFG tdata, uint8_t level, unsigned long ms, const char *domain, const char *subdomain, bool useUDP, bool cr)
 {
     char lString[5 + 1];
     char arm[3 + 1];

@@ -1,6 +1,6 @@
 #include "ComplementaryFilterBase.h"
 
-ComplementaryFilterBase::ComplementaryFilterBase(HardwareSerial *lidarBus, uint8_t pinCSPMW3901, TDataComplementaryFilterCfg *cfg)
+ComplementaryFilterBase::ComplementaryFilterBase(HardwareSerial *lidarBus, uint8_t pinCSPMW3901, TSensorCFG *cfg)
     : cfg(cfg),
       lastValidSensorRead(0),
       lidarBus(lidarBus), pinCSPMW3901(pinCSPMW3901)
@@ -21,7 +21,7 @@ ComplementaryFilterBase::~ComplementaryFilterBase()
     delete driftYPID;
 }
 
-void ComplementaryFilterBase::updateOpticalFlow(TDataComplementaryFilter *filterData)
+void ComplementaryFilterBase::updateOpticalFlow(TDataSensors *filterData)
 {
     int16_t deltaX = 0, deltaY = 0;
 
@@ -42,13 +42,13 @@ void ComplementaryFilterBase::updateOpticalFlow(TDataComplementaryFilter *filter
     }
 }
 
-void ComplementaryFilterBase::updateYawCompensation(TDataComplementaryFilter *filterData)
+void ComplementaryFilterBase::updateYawCompensation(TDataSensors *filterData)
 {
     filterData->pidYawInput = filterData->rawYaw; // Aktueller Yaw-Winkel
     yawPID->Compute();                            // Berechnung des Yaw-Outputs
 }
 
-void ComplementaryFilterBase::updateDriftCompensation(TDataComplementaryFilter *filterData)
+void ComplementaryFilterBase::updateDriftCompensation(TDataSensors *filterData)
 {
     filterData->pidDriftXInput = filterData->rawDrift[0]; // Aktueller Drift in X-Richtung
     filterData->pidDriftYInput = filterData->rawDrift[1]; // Aktueller Drift in Y-Richtung
@@ -57,7 +57,7 @@ void ComplementaryFilterBase::updateDriftCompensation(TDataComplementaryFilter *
     driftYPID->Compute(); // Berechnung der Drift-Y-Kompensation
 }
 
-void ComplementaryFilterBase::begin(TDataComplementaryFilter *filterData)
+void ComplementaryFilterBase::begin(TDataSensors *filterData)
 {
     //
     // Konfiguration des PID-Controllers. Die Ein- und Ausgabe wird in die Datenstruktur direkt geschrieben

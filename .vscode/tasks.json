@@ -3,20 +3,51 @@
 	"tasks": [
 		{
 			"type": "PlatformIO",
-			"task": "Pre-Debug",
+			"task": "Clean",
 			"problemMatcher": [
 				"$platformio"
 			],
-			"label": "PlatformIO: Pre-Debug"
+			"group": "clean",
+			"label": "PlatformIO: Clean"
 		},
 		{
 			"type": "PlatformIO",
-			"task": "Build (esp32dev_debug)",
+			"task": "Build (release)",
 			"problemMatcher": [
 				"$platformio"
 			],
 			"group": "build",
-			"label": "PlatformIO: Build (esp32dev_debug)"
+			"label": "PlatformIO: Build (release)"
+		},
+		{
+			"type": "PlatformIO",
+			"task": "Build (debug)",
+			"problemMatcher": [
+				"$platformio"
+			],
+			"group": "build",
+			"label": "PlatformIO: Build (debug)"
+		},
+		{
+			"type": "PlatformIO",
+			"task": "Build (unit_test)",
+			"problemMatcher": [
+				"$platformio"
+			],
+			"group": "build",
+			"label": "PlatformIO: Build (unit_test)"
+		},
+		{
+			"type": "PlatformIO",
+			"task": "Build",
+			"problemMatcher": [
+				"$platformio"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"label": "PlatformIO: Build"
 		}
 	]
 }

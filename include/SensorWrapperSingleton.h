@@ -22,7 +22,7 @@
 class SensorWrapperSingleton
 {
 private:
-    SensorWrapperSingleton(HardwareSerial *lidarBus, uint8_t pinCSPMW3901, TDataComplementaryFilterCfg *cfg);
+    SensorWrapperSingleton(HardwareSerial *lidarBus, uint8_t pinCSPMW3901, TSensorCFG *cfg);
     static SensorWrapperSingleton *instance;
 
     SensorWrapperSingleton(const SensorWrapperSingleton &) = delete;
@@ -35,7 +35,7 @@ public:
      * @brief gibt eine neue oder die aktuelle Instanz des SensorWrapperSingleton zurück
      *
      */
-    static SensorWrapperSingleton *getInstance(HardwareSerial *lidarBus, uint8_t pinCSPMW3901, TDataComplementaryFilterCfg *cfg)
+    static SensorWrapperSingleton *getInstance(HardwareSerial *lidarBus, uint8_t pinCSPMW3901, TSensorCFG *cfg)
     {
         if (instance == nullptr)
         {
@@ -50,7 +50,7 @@ public:
      * der Sensoren liegt in der lokalen Struktur und wir hier als zeiger zurück gegeben
      * @return TDataComplementaryFilter Zeiger auf die Struktur
      */
-    TDataComplementaryFilter *getData() { return this->lokalFilterData; };
+    TDataSensors *getData() { return this->lokalFilterData; };
 
     /**
      * @brief Liest vom OpticalFlowSensor die Bewegung und gibt die Werte in deltaX und deltaY zurück
@@ -68,8 +68,8 @@ private:
     VL53L1X *sensorToF;
     Bitcraze_PMW3901 *sensorOptFlow;
 
-    TDataComplementaryFilterCfg *cfg;
-    TDataComplementaryFilter *lokalFilterData;
+    TSensorCFG *cfg;
+    TDataSensors *lokalFilterData;
 
     PID *heightPID, *yawPID, *driftXPID, *driftYPID;
 };
