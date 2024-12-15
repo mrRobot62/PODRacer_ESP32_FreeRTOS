@@ -19,56 +19,103 @@ Für **MAC** und **WINDOWS** gibt es zwei weitere Kapitel mit "Spezialitäten" ;
 - **monitor_speed**: während des Debuggens funktioniert die Ausgabe über Serial.print() **NICHT**
 -  
 ```
+[env]
+build_flags = 
+    -I include
+;    -fpermissive
+    -DUSE_SPIFFS
+    -DconfigUSE_TRACE_FACILITY=1
+    -DconfigUSE_STATS_FORMATTING_FUNCTIONS=1
+lib_extra_dirs = ~/Documents/Arduino/libraries
+lib_deps = 
+    SPIFFS
+    frankboesing/FastCRC@^1.41
+    br3ttb/PID@^1.2.1
+    budryerson/TFMPlus@^1.5.0
+    me-no-dev/AsyncTCP@^1.1.1
+    mathieucarbou/ESPAsyncWebServer@^3.3.12
+    bblanchon/ArduinoJson@^7.2.0
+    bolderflight/Bolder Flight Systems SBUS@^8.1.4
+    adafruit/Adafruit MPU6050@^2.2.6
 
-[env:esp32dev_debug]
+;--------------------------------------------------------------
+; RELEASE build
+;--------------------------------------------------------------
+[env:release]
 platform = espressif32
 board = esp32dev
 framework = arduino
 monitor_speed = 115200
-platform_packages = tool-openocd-esp32 @ ~2.1200.0
-debug_tool = esp-prog 
-upload_protocol = esp-prog
-;upload_port = /dev/cu.usbserial-101
-debug_init_break = tbreak mixerTask 
-debug_speed = 5000 
-build_type = debug 
-build_unflags = -O1 -O2 -O3 -Os -s -Wl,-S
-
-debug_build_flags = 
-	-O0
-	-g3
-	-ggdb
-	-DDEBUG
-	-DCORE_DEBUG_LEVEL=5
-;	-DARDUINO_RUNNING_CORE=0
-	-DDEBUG_FREERTOS
-    -fno-inline
-    -fno-omit-frame-pointer
-	-gdwarf-2
-
-debug_extra_cmds =
-    source /Users/bernhardklein/esp/esp-idf/gdbinit
-    set substitute-path /home/runner/work/esp32-arduino-lib-builder/esp32-arduino-lib-builder/esp-idf /Users/bernhardklein/esp/esp-idf
+board_build.filesystem = spiffs
 
 build_flags = 
-	-I include
-	-fpermissive
-	-DUSE_SPIFFS
-	-DconfigUSE_TRACE_FACILITY=1
-	-DconfigUSE_STATS_FORMATTING_FUNCTIONS=1
+    ${env.build_flags}
+    -O3
+lib_extra_dirs =
+    ${env.lib_extra_dirs}
+lib_deps =
+    ${env.lib_deps}
 
-lib_extra_dirs = ~/Documents/Arduino/libraries
-lib_deps = 
-	SPIFFS
-	frankboesing/FastCRC@^1.41
-	br3ttb/PID@^1.2.1
-	budryerson/TFMPlus@^1.5.0
-	me-no-dev/AsyncTCP@^1.1.1
-	mathieucarbou/ESPAsyncWebServer@^3.3.12
-	bblanchon/ArduinoJson@^7.2.0
-	bolderflight/Bolder Flight Systems SBUS@^8.1.4
-	adafruit/Adafruit MPU6050@^2.2.6
+
+;--------------------------------------------------------------
+; DEBUG build
+;--------------------------------------------------------------
+[env:debug]
+platform = espressif32
+board = esp32dev
+framework = arduino
 board_build.filesystem = spiffs
+
+debug_tool = esp-prog
+upload_protocol = esp-prog
+debug_init_break = tbreak setup
+debug_speed = 20000
+build_type = debug
+build_unflags = -O1 -O2 -O3 -Os -s -Wl,-S
+platform_packages = tool-openocd-esp32 @ ~2.1200.0
+debug_build_flags = 
+    ${env.build_flags}
+    -O0
+    -g3
+    -ggdb
+    -DDEBUG
+    -DCORE_DEBUG_LEVEL=5
+    -DDEBUG_FREERTOS
+    -fno-inline
+    -fno-omit-frame-pointer
+    -gdwarf-2
+debug_extra_cmds = 
+    source /Users/bernhardklein/esp/esp-idf/gdbinit
+    set substitute-path /home/runner/work/esp32-arduino-lib-builder/esp32-arduino-lib-builder/esp-idf /Users/bernhardklein/esp/esp-idf
+lib_extra_dirs =
+    ${env.lib_extra_dirs}
+lib_deps =
+    ${env.lib_deps}
+
+;--------------------------------------------------------------
+; UNIT-Test build
+;--------------------------------------------------------------
+[env:unit_test]
+platform = espressif32
+board = esp32dev
+framework = arduino
+board_build.filesystem = spiffs
+monitor_speed = 115200
+
+test_build_src = true
+;test_filter = test_sensors/*
+
+build_unflags = -Wall
+build_flags = 
+    ${env.build_flags}
+    -w
+
+lib_extra_dirs =
+    ${env.lib_extra_dirs}
+lib_deps =
+    ${env.lib_deps}
+    throwtheswitch/Unity@^2.6.0
+
 ```
 
 ## launch.json

@@ -53,7 +53,7 @@ int ConfigManager::getAllKeys(const char* namespace_name, String** keys, size_t*
     if (*keys == NULL) {
         Serial.println("Speicherallokierung fehlgeschlagen.");
         *key_count = 0;
-        return;
+        return -1;
     }
 
     *key_count = 0;
@@ -69,7 +69,7 @@ int ConfigManager::getAllKeys(const char* namespace_name, String** keys, size_t*
                 Serial.println("Speicher-Reallokierung fehlgeschlagen.");
                 *key_count = 0;
                 nvs_release_iterator(it);
-                return;
+                return -1;
             }
         }
         (*keys)[*key_count] = String(info.key);

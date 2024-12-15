@@ -10,14 +10,14 @@ void test_example()
     TEST_ASSERT_EQUAL(2, 1 + 1); // Ein einfacher Test
 }
 
-void setup()
+void test_setup()
 {
     UNITY_BEGIN();
     RUN_TEST(test_example);
     UNITY_END();
 }
 
-void loop() {}
+void test_loop() {}
 
 // /**
 //  * @brief
