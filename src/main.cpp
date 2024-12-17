@@ -11,8 +11,7 @@
 #include "globals.h"
 #include "Logger.h"
 #include "MonitoringTask.h"
-#include "SensorWrapperSingleton.h"
-
+#include "SensorTask.h"
 #include "Utils.h"
 
 // ************************************************************************************************************
@@ -71,19 +70,21 @@ SemaphoreHandle_t xSemaSensorLidar; // TFPlus
 SemaphoreHandle_t xSemaSensorTOF;   // VL53X1
 SemaphoreHandle_t xSemaSensorIMU;   // MPU6xxxx
 SemaphoreHandle_t xSemaSensorUS;    // Ultraschall
+SemaphoreHandle_t xSemaSensors;     // Allgemeiner Semphar für SemaphorTask
 
 EventGroupHandle_t xEventGroup;
 
 //
 // Logging-Pattern, detaillierte Beschreibung siehe readme_logging.md.
 // Bit 7 ist generell für loggen ON(1)/OFF(0), Bit 6-0 sind indivduell
-uint8_t LOG_MASK_RECEIVER = 0b00100000; // B6 = READ, B5=WRITE, B0=MISC
-uint8_t LOG_MASK_MIXER = 0b01000010;    //
+uint8_t LOG_MASK_RECEIVER = 0b01100000; // B6 = READ, B5=WRITE, B0=MISC
+uint8_t LOG_MASK_MIXER = 0b11000010;    // B6 = R_IN
 uint8_t LOG_MASK_SURFACE = 0b01100000;  //
 uint8_t LOG_MASK_HOVER = 0b01100000;    //
 uint8_t LOG_MASK_STATUS = 0b01000000;
+uint8_t LOG_MASK_SENSOR = 0b01000000;
 
-uint8_t LOG_MASK_COMPFLIT = 0b1000000;
+uint8_t LOG_MASK_COMPFLIT = 0b0000000;
 
 // uint8_t MOCK_DATA_MASK_SBUS     =0b00000001;    // Verhalten 0, mehr Details siehe readme_mock.md
 // uint8_t MOCK_DATA_MASK_SBUS     = 0b00000010;   // Verhalten 1, mehr Details siehe readme_mock.md
@@ -105,9 +106,7 @@ uint8_t MOCK_DATA_MASK_MIXER = 0b00000001;
 uint8_t ch_map[NUM_CHANNELS] = {0, 1, 7, 3, 4, 2, 5, 6};
 
 TSBUSGlobalDefaultValues gSBUSDefaultValues;
-TDataSensors sensorData;
 TSensorCFG sensorCFG;
-SensorWrapperSingleton *sensorWrapper;
 
 uint8_t blink_mask[3];
 
@@ -140,16 +139,6 @@ void setup()
   setChannelMapping(DEFAULT_CHANNEL_MAP);
   logger->info(ch_map);
 
-  // sensorWrapper = SensorWrapperSingleton::getInstance(
-  //   &Serial2,
-  //   PIN_CS_PMW3901,
-  //   sensorCFG);
-
-
-  // ------------------------------------------------------------------------------
-  // Sensoren initialisieren
-  // ------------------------------------------------------------------------------
-
   // Erstelle die Queues
   queueReceiver = xQueueCreate(QUEUE_SIZE, sizeof(TDataRC));
   queueSurface = xQueueCreate(QUEUE_SIZE, sizeof(TDataSurface));
@@ -174,32 +163,43 @@ void setup()
     Serial.println("Failed to create event group");
     return; // Bei Fehler kann das Programm hier sicher abbrechen oder neu starten
   }
+  Serial.println("\nEvent group ready.....\n");
 
   // ReceiverTask wird Core 0 zugewiesen (höchste Priorität)
   xTaskCreatePinnedToCore(receiverTask, "ReceiverTask", 4096, NULL, 2, NULL, 1);
+  Serial.println("\nReceiver task created.....\n");
+
+  // SensorTask, läuft auf CORE 1
+  xTaskCreatePinnedToCore(sensorTask, "SensorTask", 4096, NULL, 2, NULL, 1);
+  Serial.println("\nSensorTask task created.....\n");
 
   // Hover wird Core 1 zugewiesen
   xTaskCreatePinnedToCore(hoverTask, "HoverTask", 4096, NULL, 1, NULL, 1);
+  Serial.println("\HoverTask task created.....\n");
 
   // DistanceTask wird Core 1 zugewiesen
   // xTaskCreatePinnedToCore(surfaceTask, "SurfaceTask", 4096, NULL, 1, NULL, 1);
+  // Serial.println("\SurfaceTask task created.....\n");
 
   // MixerTask wird Core 1 zugewiesen
   xTaskCreatePinnedToCore(mixerTask, "MixerTask", 4096, NULL, 1, NULL, 1);
+  Serial.println("\nMixerTask task created.....\n");
 
   // Starte den WebServer als FreeRTOS-Task
   // vermutlich stimmt was nicht mit HEAP oder QUEUE größe, Runtime Fehler
   // xTaskCreatePinnedToCore(webServerTask, "WebServerTask", 8192, NULL, 1, NULL, 0);
+  // Serial.println("\WebServerTask task created.....\n");
 
   // Starte BlinkTask mit niedriger Prio
   // Parameter 1 : PIN, Parameter 2:
   static uint32_t led1Params[] = {LED_STATE, 0x00, 0b00010000};
-  static uint32_t led2Params[] = {LED_ERR1, 0x01, 0b00100000};
-  static uint32_t led3Params[] = {LED_ERR2, 0x02, 0b01000000};
+  static uint32_t led2Params[] = {LED_ERR01, 0x01, 0b00100000};
+  static uint32_t led3Params[] = {LED_ERR02, 0x02, 0b01000000};
 
   xTaskCreatePinnedToCore(blinkTask, "LED1Task", 2560, led1Params, 1, NULL, 1);
   xTaskCreatePinnedToCore(blinkTask, "LED2Task", 2560, led2Params, 1, NULL, 1);
   xTaskCreatePinnedToCore(blinkTask, "LED3Task", 2560, led3Params, 1, NULL, 1);
+  Serial.println("\nLED1Task, LED2Task, LED3Task task created.....\n");
 
   // Erstelle den MonitoringTask mit einer moderaten Priorität
   // xTaskCreate(
@@ -210,6 +210,7 @@ void setup()
   //     1,                // Task-Priorität
   //     nullptr           // Task-Handle (optional)
   // );
+  // Serial.println("\nMonitoringTask task created.....\n");
 }
 
 void loop()

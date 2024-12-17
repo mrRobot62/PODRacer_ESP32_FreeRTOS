@@ -12,6 +12,7 @@ void mixerTask(void *parameter)
   // Diese Daten werden dann ausgewertet und dann gesichert in die globale Struktur TDataAll zurück geschrieben
   //
   //
+  Serial.println("MixerTask starting...");
 
   static TDataAll lokalDataAll;
 
@@ -27,7 +28,7 @@ void mixerTask(void *parameter)
   // globaler Mutex: xTDataAllMutex, wird zum Sperren der TDataAll Struktur genutzt
   xTDataAllMutex = xSemaphoreCreateMutex();
 
-  Serial.println("Mixer running...");
+  Serial.println("MixerTask running...");
 
   while (!generalFreeRTOSError) // bei globalen Fehlern wird der Task abgebrochen
   {

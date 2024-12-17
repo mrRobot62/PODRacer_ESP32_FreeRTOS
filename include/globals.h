@@ -44,8 +44,8 @@
 // TDI => PIN 12 (GPIO)
 
 #define LED_STATE 32 // blau (RUNNING, Armed, Disarmed)
-#define LED_ERR1 33  // rot (Fehler)
-#define LED_ERR2 27  // rot (Fehler)
+#define LED_ERR01 33 // rot (Fehler)
+#define LED_ERR02 25 // rot (Fehler)
 
 // PMW3901 wird über SPI angesteuert
 #define PIN_CS_PMW3901 5
@@ -62,6 +62,16 @@ extern uint8_t MOCK_DATA_MASK_TFMini;
 extern uint8_t MOCK_DATA_MASK_VL53X1;
 
 extern uint8_t blink_mask[3];
+
+extern SemaphoreHandle_t xTDataAllMutex;
+extern SemaphoreHandle_t xbitmaskBlinkMutex;
+
+extern SemaphoreHandle_t xSemaSensorOFlow; // PMW3901
+extern SemaphoreHandle_t xSemaSensorLidar; // TFPlus
+extern SemaphoreHandle_t xSemaSensorTOF;   // VL53X1
+extern SemaphoreHandle_t xSemaSensorIMU;   // MPU6xxxx
+extern SemaphoreHandle_t xSemaSensorUS;    // Ultraschall
+
 
 extern bool generalFreeRTOSError;
 

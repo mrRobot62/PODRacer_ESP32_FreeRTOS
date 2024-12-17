@@ -53,7 +53,7 @@ void receiverTask(void *parameter)
   //
   //
 
-  Serial.println("Receiver running...");
+  Serial.println("Receiver starting...");
 //
 // Soll die Mock-Klasse oder die physikalische Sensor-Klasse eingebunden werden
 //
@@ -63,6 +63,7 @@ void receiverTask(void *parameter)
   // receiver = new ReceiverSBUS(nullptr, SBUS_RX_PIN, SBUS_TX_PIN);
   receiver = new ReceiverSBUS(SBUS_RX_PIN, SBUS_TX_PIN);
 #endif
+  Serial.println("Receiver running...");
 
   while (!generalFreeRTOSError) // bei globalen Fehlern wird der Task abgebrochen
   {
@@ -164,14 +165,13 @@ void receiverTask(void *parameter)
           updateMaskBlinkPattern(0b00100001, 1); // LED_ERR1 fast
           updateMaskBlinkPattern(0b00000000, 2); // LED_ERR2 off
         }
-        else 
+        else
         {
           // normales DISARM BlinkPattern
           updateMaskBlinkPattern(0b00011000, 0); // LED_STATE => 1000ms
           updateMaskBlinkPattern(0b00000000, 1); // LED_ERR1 off
           updateMaskBlinkPattern(0b00000000, 2); // LED_ERR2 off
         }
-
       }
     }
     else
@@ -191,26 +191,26 @@ void receiverTask(void *parameter)
     // liest der ReceiverTask die global TDataAll Struktur und schreibt die Daten
     // über SBUS.write() zum FlightController
 
-    EventBits_t uxBits = xEventGroupGetBits(xEventGroup);
-    // Prüfen, ob das spezifische BIT_RECEIVER gesetzt ist
-    if (uxBits & BIT_RECEIVER)
-    {
-      if (xSemaphoreTake(xTDataAllMutex, MUTEX_WAIT_TIMEOUT) == pdTRUE)
-      {
-        receiver->write(&globalData.rc);
-        xSemaphoreGive(xTDataAllMutex);
-        if (CHECK_BIT(LOG_MASK_RECEIVER, LOGGING_BIT) && CHECK_BIT(LOG_MASK_RECEIVER, LOGGING_RECV_WRITE))
-        {
-          logger->info(globalData.rc, millis(), "RECV", "WRITE");
-        }
-        // Lösche das Ereignisbit, nachdem die Aktion abgeschlossen ist
-        xEventGroupClearBits(xEventGroup, BIT_RECEIVER);
-      }
-    }
-    else
-    {
-      logger->warn(*lokalRCData, millis(), "RECVW", "MUTEX");
-    }
+    // EventBits_t uxBits = xEventGroupGetBits(xEventGroup);
+    // // Prüfen, ob das spezifische BIT_RECEIVER gesetzt ist
+    // if (uxBits & BIT_RECEIVER)
+    // {
+    //   if (xSemaphoreTake(xTDataAllMutex, MUTEX_WAIT_TIMEOUT) == pdTRUE)
+    //   {
+    //     receiver->write(&globalData.rc);
+    //     xSemaphoreGive(xTDataAllMutex);
+    //     if (CHECK_BIT(LOG_MASK_RECEIVER, LOGGING_BIT) && CHECK_BIT(LOG_MASK_RECEIVER, LOGGING_RECV_WRITE))
+    //     {
+    //       logger->info(globalData.rc, millis(), "RECV", "WRITE");
+    //     }
+    //     // Lösche das Ereignisbit, nachdem die Aktion abgeschlossen ist
+    //     xEventGroupClearBits(xEventGroup, BIT_RECEIVER);
+    //   }
+    // }
+    // else
+    // {
+    //   logger->warn(*lokalRCData, millis(), "RECVW", "MUTEX");
+    // }
     //
     // den akutellen Status zwischenspeichern
     // lastGlobalStatus = globalData.status.status_pattern;

@@ -5,9 +5,9 @@ Verfügbar stehen drei LEDs. 1x blau, 2x rot
 
 | LED        |  PIN  | Farbe | Info                  |
 | ---------- | :---: | ----- | --------------------- |
-| LED_STATUS |  12   | blau  | Status für ARM/DISARM |
-| LED_ERR1   |  14   | rot   | Fehler-Indikator 1    |
-| LED_ERR2   |  27   | rot   | Fehler-Indikator 2    |
+| LED_STATUS |  32   | blau  | Status für ARM/DISARM |
+| LED_ERR1   |  33   | rot   | Fehler-Indikator 1    |
+| LED_ERR2   |  25   | rot   | Fehler-Indikator 2    |
 |            |       |       |                       |
 
 ## Blink-Pattern
